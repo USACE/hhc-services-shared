@@ -1,7 +1,8 @@
 """ """
 
-from pathlib import Path
 import string
+from pathlib import Path
+from zipfile import ZipFile
 
 import requests
 from shapely.geometry import shape
@@ -70,32 +71,36 @@ missions = {
 }
 
 parent = Path(__file__).parent
+geom_zip = parent / "mission_geom.zip"
 
-for id, dist in districts.items():
-    filename = parent / f"{dist}_mission_geom.sql"
+with ZipFile(geom_zip, mode="w") as zipp:
+    for id, dist in districts.items():
+        print(id, dist)
 
-    write_lines = []
-    write_lines.append("INSERT INTO usace.office_aor (office_id, mission, geom) VALUES")
+        write_lines = []
 
-    for mission, url in missions.items():
-        url = url.substitute(SYMBOL=dist)
-        resp = requests.get(url)
-        resp_json = resp.json()
+        write_lines.append(
+            "INSERT INTO usace.office_aor (office_id, mission, geom) VALUES "
+        )
 
-        features = resp_json.get("features")
+        for mission, url in missions.items():
+            url = url.substitute(SYMBOL=dist)
+            resp = requests.get(url)
+            resp_json = resp.json()
 
-        if len(features) > 0:
-            feature = features[0]
-            geometry = feature.get("geometry")
-            geom_shape = shape(geometry)
-            wkt = geom_shape.wkt
+            features = resp_json.get("features")
 
-            # geom = f"ST_GeomFromText('{wkt}', 4326)"
+            if len(features) > 0:
+                feature = features[0]
+                geometry = feature.get("geometry")
+                geom_shape = shape(geometry)
+                wkt = geom_shape.wkt
 
-            write_lines.append(f"('{id}', '{mission}', ST_GeomFromText('{wkt}', 4326))")
-            write_lines.append(",")
-            # write_lines.append(f"{write_line},\n")
+                write_lines.append(
+                    f"('{id}', '{mission}', ST_GeomFromText('{wkt}', 4326))"
+                )
+                write_lines.append(",")
 
-write_lines[-1] = ";"
-with filename.open(mode="+w") as fp:
-    fp.writelines(write_lines)
+        write_lines[-1] = ";"
+
+    zipp.writestr(f"{dist}_mission_geom.sql", "".join(write_lines))
