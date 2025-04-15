@@ -1,0 +1,20 @@
+ARG PG_MAJOR=17
+ARG POSTGIS_MAJOR=3
+
+# *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+FROM postgres:${PG_MAJOR}
+ARG PG_MAJOR
+ARG POSTGIS_MAJOR
+
+# solving possible issue of APT behind a proxy
+RUN cat <<EOF > /etc/apt/apt.conf.d/99proxy
+Acquire::http::Pipeline-Depth 0;
+Acquire::http::No-Cache true;
+Acquire::BrokenProxy true;
+EOF
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    postgresql-${PG_MAJOR}-postgis-${POSTGIS_MAJOR} \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*

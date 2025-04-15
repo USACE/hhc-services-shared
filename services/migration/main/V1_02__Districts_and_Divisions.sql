@@ -1,0 +1,79 @@
+-- uuid extension needed for tables using uuid
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA ${flyway:defaultSchema};
+
+-- create the divisions, offices, and their relationship
+CREATE TABLE IF NOT EXISTS office(
+    id varchar(2) NOT NULL
+    , code varchar(3) NOT NULL
+    , symbol varchar(5) NOT NULL
+    , fullname varchar NOT NULL
+    , office_type varchar NOT NULL
+    , parent_id varchar(2)
+    , CONSTRAINT office_pk PRIMARY KEY (id)
+    , CONSTRAINT office_unique UNIQUE (code , fullname)
+    , CONSTRAINT office_parent_fk FOREIGN KEY (parent_id) REFERENCES office(id)
+);
+
+-- populate the office table with divisions
+INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
+    VALUES ('S0' , 'HQ' , 'HQ' , 'Headquarters' , 'HQ' , NULL)
+    ,('H0' , 'LRD' , 'CELRD' , 'Great Lakes and Ohio River Division' , 'MSC' , 'S0')
+    ,('B0' , 'MVD' , 'CEMVD' , 'Mississippi Valley Division' , 'MSC' , 'S0')
+    ,('E0' , 'NAD' , 'CENAD' , 'North Atlantic Division' , 'MSC' , 'S0')
+    ,('G0' , 'NWD' , 'CENWD' , 'Northwestern Division' , 'MSC' , 'S0')
+    ,('J0' , 'POD' , 'CEPOD' , 'Pacific Ocean Division' , 'MSC' , 'S0')
+    ,('K0' , 'SAD' , 'CESAD' , 'South Atlantic Division' , 'MSC' , 'S0')
+    ,('L0' , 'SPD' , 'CESPD' , 'South Pacific Division' , 'MSC' , 'S0')
+    ,('M0' , 'SWD' , 'CESWD' , 'Southwestern Division' , 'MSC' , 'S0')
+    ,('N0' , 'TAD' , 'CETAD' , 'Trans Atlantic Division' , 'MSC' , 'S0');
+
+-- populate the office table with districts
+INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
+    VALUES 
+     ('H1' , 'LRH' , 'CELRH' , 'Huntington District' , 'DIST' , 'H0')
+    ,('H2' , 'LRL' , 'CELRL' , 'Louisville District' , 'DIST' , 'H0')
+    ,('H3' , 'LRN' , 'CELRN' , 'Nashville District' , 'DIST' , 'H0')
+    ,('H4' , 'LRP' , 'CELRP' , 'Pittsburgh District' , 'DIST' , 'H0')
+    ,('H5' , 'LRB' , 'CELRB' , 'Buffalo District' , 'DIST' , 'H0')
+    ,('H6' , 'LRC' , 'CELRC' , 'Chicago District' , 'DIST' , 'H0')
+    ,('H7' , 'LRE' , 'CELRE' , 'Detroit District' , 'DIST' , 'H0')
+    ,('B1' , 'MVM' , 'CEMVM' , 'Memphis District' , 'DIST' , 'B0')
+    ,('B2' , 'MVN' , 'CEMVN' , 'New Orleans District' , 'DIST' , 'B0')
+    ,('B3' , 'MVS' , 'CEMVS' , 'St. Louis District' , 'DIST' , 'B0')
+    ,('B4' , 'MVK' , 'CEMVK' , 'Vicksburg District' , 'DIST' , 'B0')
+    ,('B5' , 'MVR' , 'CEMVR' , 'Rock Island District' , 'DIST' , 'B0')
+    ,('B6' , 'MVP' , 'CEMVP' , 'St. Paul District' , 'DIST' , 'B0')
+    ,('E1' , 'NAB' , 'CENAB' , 'Baltimore District' , 'DIST' , 'E0')
+    ,('E3' , 'NAN' , 'CENAN' , 'New York District' , 'DIST' , 'E0')
+    ,('E4' , 'NAO' , 'CENAO' , 'Norfolk District' , 'DIST' , 'E0')
+    ,('E5' , 'NAP' , 'CENAP' , 'Philadelphia District' , 'DIST' , 'E0')
+    ,('E6' , 'NAE' , 'CENAE' , 'New England District' , 'DIST' , 'E0')
+    ,('E7' , 'NAU' , 'CENAU' , 'Europe District' , 'DIST' , 'E0')
+    ,('G2' , 'NWP' , 'CENWP' , 'Portland District' , 'DIST' , 'G0')
+    ,('G3' , 'NWS' , 'CENWS' , 'Seattle District' , 'DIST' , 'G0')
+    ,('G4' , 'NWW' , 'CENWW' , 'Walla Walla District' , 'DIST' , 'G0')
+    ,('G5' , 'NWK' , 'CENWK' , 'Kansas City District' , 'DIST' , 'G0')
+    ,('G6' , 'NWO' , 'CENWO' , 'Omaha District' , 'DIST' , 'G0')
+    ,('J1' , 'POF' , 'CEPOF' , 'Far East District' , 'DIST' , 'J0')
+    ,('J2' , 'POJ' , 'CEPOJ' , 'Japan District' , 'DIST' , 'J0')
+    ,('J3' , 'POH' , 'CEPOH' , 'Honolulu District' , 'DIST' , 'J0')
+    ,('J4' , 'POA' , 'CEPOA' , 'Alaska District' , 'DIST' , 'J0')
+    ,('K2' , 'SAC' , 'CESAC' , 'Charleston District' , 'DIST' , 'K0')
+    ,('K3' , 'SAJ' , 'CESAJ' , 'Jacksonville District' , 'DIST' , 'K0')
+    ,('K5' , 'SAM' , 'CESAM' , 'Mobile District' , 'DIST' , 'K0')
+    ,('K6' , 'SAS' , 'CESAS' , 'Savannah District' , 'DIST' , 'K0')
+    ,('K7' , 'SAW' , 'CESAW' , 'Wilmington District' , 'DIST' , 'K0')
+    ,('K8' , 'SAA' , 'CESAA' , 'Caribbean District' , 'DIST' , 'K0')
+    ,('L1' , 'SPL' , 'CESPL' , 'Los Angeles District' , 'DIST' , 'L0')
+    ,('L2' , 'SPK' , 'CESPK' , 'Sacramento District' , 'DIST' , 'L0')
+    ,('L3' , 'SPN' , 'CESPN' , 'San Francisco District' , 'DIST' , 'L0')
+    ,('L4' , 'SPA' , 'CESPA' , 'Albuquerque District' , 'DIST' , 'L0')
+    ,('M2' , 'SWF' , 'CESWF' , 'Fort Worth District' , 'DIST' , 'M0')
+    ,('M3' , 'SWG' , 'CESWG' , 'Galveston District' , 'DIST' , 'M0')
+    ,('M4' , 'SWL' , 'CESWL' , 'Little Rock District' , 'DIST' , 'M0')
+    ,('M5' , 'SWT' , 'CESWT' , 'Tulsa District' , 'DIST' , 'M0')
+    ,('N2' , 'TED' , 'CETED' , 'Transatlantic Expeditionary District' , 'DIST' , 'N0')
+    ,('P0' , 'GRD' , 'CEGRD' , 'Gulf Region District' , 'DIST' , 'N0')
+    ,('E2' , 'WAD' , 'CEWAD' , 'Washington Aqueduct' , 'DIST' , NULL);
+

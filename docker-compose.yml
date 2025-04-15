@@ -1,0 +1,39 @@
+name: usace-shared-stack
+services:
+  database:
+    platform: linux/amd64
+    container_name: database
+    build:
+      context: ./services/database
+      args:
+        PG_MAJOR: 17
+        POSTGIS_MAJOR: 3
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+# --------------------------------------
+  migration:
+    platform: linux/amd64
+    container_name: migration
+    build:
+      context: ./services/migration
+    restart: on-failure
+    # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
+    environment:
+      FLYWAY_DEFAULT_SCHEMA: usace
+      FLYWAY_EDITION: community
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
+      FLYWAY_URL: jdbc:postgresql://database:5432/postgres
+      FLYWAY_VALIDATE_MIGRATION_NAMING: true
+      FLYWAY_DB_HOST: database
+      FLYWAY_PLACEHOLDERS_APP_PASSWORD: usace_password
+      FLYWAY_PLACEHOLDERS_GIS_PASSWORD: gis_password
+    depends_on:
+      - database
+    volumes:
+      - ./services/migration/local:/flyway/sql/local:ro
+# --------------------------------------

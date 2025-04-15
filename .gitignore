@@ -1,0 +1,6 @@
+**/*.DS_Store
+
+# sql files from the geometry generator python script
+**/geom/*.sql
+
+**/*.zip

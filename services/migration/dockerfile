@@ -1,0 +1,29 @@
+# *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+# FROM runner running flyway with the shapefiles
+# *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+FROM flyway/flyway AS runner
+
+ENV OPT_MIGRATION=/opt/migration
+
+# solving possible issue of APT behind a proxy
+RUN cat <<EOF > /etc/apt/apt.conf.d/99proxy
+Acquire::http::Pipeline-Depth 0;
+Acquire::http::No-Cache true;
+Acquire::BrokenProxy true;
+EOF
+
+RUN apt-get update \
+    && apt-get install -y postgis postgresql-client unzip curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# only get the main migrations into the image
+# local migrations for testing is defined in the docker-compose file
+COPY ./main /flyway/sql/main
+
+# staging data is for the usace schema; the default schema
+COPY ./staging $OPT_MIGRATION
+
+ENTRYPOINT ["flyway"]
+
+CMD ["-connectRetries=60", "migrate"]
