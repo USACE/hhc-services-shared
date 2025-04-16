@@ -20,7 +20,7 @@ services:
     build:
       context: ./services/migration
     restart: on-failure
-    entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
+    # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
     environment:
       FLYWAY_DEFAULT_SCHEMA: usace
       FLYWAY_EDITION: community
