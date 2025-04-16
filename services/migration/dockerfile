@@ -33,14 +33,14 @@ WORKDIR ${OPT_MIGRATION}
 COPY ./dist_geom ./dist_geom
 
 # add the release asset for the tagged version defined in GEOM_VERSION
-ADD https://github.com/USACE/usace-services-shared/releases/download/${GEOM_VERSION}/geometry.tar.gz ${OPT_MIGRATION}
+ADD https://github.com/USACE/hhc-services-shared/releases/download/${GEOM_VERSION}/geometry.tar.gz ${OPT_MIGRATION}
 
 # decompress/expand archive and remove original download
 # if the archive was created with directories, move the files to the current directory
 RUN tar -xzvf geometry.tar.gz \
     && rm -f geometry.tar.gz
 
-# staging data is for the usace schema; the default schema
+# staging data is for the hhc schema; the default schema
 # mainly using this for local development and should be empty
 COPY ./staging $OPT_MIGRATION
 

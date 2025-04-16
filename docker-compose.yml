@@ -1,8 +1,8 @@
-name: usace-shared-stack
+name: hhc-shared-stack
 services:
-  database:
+  hhc-db:
     platform: linux/amd64
-    container_name: database
+    container_name: hhc-db
     build:
       context: ./services/database
       args:
@@ -14,9 +14,9 @@ services:
     ports:
       - "5432:5432"
   # --------------------------------------
-  migration:
+  hhc-migration:
     platform: linux/amd64
-    container_name: migration
+    container_name: hhc-migration
     build:
       context: ./services/migration
       args:
@@ -24,18 +24,18 @@ services:
     restart: on-failure
     # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
     environment:
-      FLYWAY_DEFAULT_SCHEMA: usace
+      FLYWAY_DEFAULT_SCHEMA: hhc
       FLYWAY_EDITION: community
       FLYWAY_LOCATIONS: filesystem:/flyway/sql
       FLYWAY_USER: postgres
       FLYWAY_PASSWORD: postgres
-      FLYWAY_URL: jdbc:postgresql://database:5432/postgres
+      FLYWAY_URL: jdbc:postgresql://hhc-db:5432/postgres
       FLYWAY_VALIDATE_MIGRATION_NAMING: true
-      FLYWAY_DB_HOST: database
+      FLYWAY_DB_HOST: hhc-db
       FLYWAY_PLACEHOLDERS_APP_PASSWORD: app_pass
       FLYWAY_PLACEHOLDERS_GIS_PASSWORD: gis_pass
     depends_on:
-      - database
+      - hhc-db
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
 # --------------------------------------

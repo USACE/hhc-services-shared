@@ -71,7 +71,7 @@ missions = {
     ),
 }
 
-schema = "usace"
+schema = "hhc"
 
 parent = Path(__file__).parent
 dist_geom = parent / "dist_geom"
