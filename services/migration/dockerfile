@@ -4,7 +4,7 @@
 FROM flyway/flyway AS runner
 
 # version of the archive for the geometry migration
-ARG GEOM_VERSION=v0.1.0-alpha
+ARG GEOM_VERSION=v0.1.1-alpha
 
 # env vars
 ENV OPT_MIGRATION=/opt/migration
