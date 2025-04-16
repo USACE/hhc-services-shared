@@ -2,7 +2,6 @@
 
 import string
 from pathlib import Path
-from zipfile import ZipFile
 
 import requests
 from shapely.geometry import shape
@@ -55,37 +54,37 @@ districts = {
     # "E2": "WAD",
 }
 
+# missions dictonary with the key making up the suffix of the table name is goes to
+# e.g., office_aor_cw
 missions = {
-    "Civil Works": string.Template(
+    "cw": string.Template(
         "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/usace_cw_districts/FeatureServer/0/query?outFields=*&where=SYMBOL%3D%27${SYMBOL}%27&f=geojson"
     ),
-    "Regulatory": string.Template(
+    "reg": string.Template(
         "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/usace_regulatory_boundary/FeatureServer/0/query?outFields=*&where=DIST_ABBR%3D%27${SYMBOL}%27&f=geojson"
     ),
-    "FUDS": string.Template(
+    "fuds": string.Template(
         "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/fuds/FeatureServer/9/query?outFields=*&where=DIST%3D%27${SYMBOL}%27&f=geojson"
     ),
-    "Military": string.Template(
+    "mil": string.Template(
         "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/usace_mil_dist/FeatureServer/0/query?outFields=*&where=DIST%3D%27${SYMBOL}%27&f=geojson"
     ),
 }
+
+schema = "usace"
 
 parent = Path(__file__).parent
 dist_geom = parent / "dist_geom"
 # geom_zip = parent / "mission_geom.zip"
 
 # with ZipFile(geom_zip, mode="w") as zipp:
-for id, dist in districts.items():
-    print(id, dist)
+for dist_id, dist in districts.items():
+    print(dist_id, dist)
     filename = dist_geom / f"{dist}_mission_geom.sql"
 
     write_lines = []
-
-    write_lines.append(
-        "INSERT INTO usace.office_aor (office_id, mission, geom) VALUES "
-    )
-
     for mission, url in missions.items():
+        dbtable = f"office_aor_{mission}"
         url = url.substitute(SYMBOL=dist)
         resp = requests.get(url)
         resp_json = resp.json()
@@ -93,16 +92,16 @@ for id, dist in districts.items():
         features = resp_json.get("features")
 
         if len(features) > 0:
+            write_lines.append(
+                f"INSERT INTO {schema}.{dbtable} (office_id, geom) VALUES "
+            )
             feature = features[0]
             geometry = feature.get("geometry")
             geom_shape = shape(geometry)
             wkt = geom_shape.wkt
 
-            write_lines.append(f"('{id}', '{mission}', ST_GeomFromText('{wkt}', 4326))")
-            write_lines.append(",")
-
-    if len(write_lines) > 1:
-        write_lines[-1] = ";"
+            write_lines.append(f"('{dist_id}', ST_GeomFromText('{wkt}', 4326))")
+            write_lines.append(";\n")
 
         with filename.open("w") as fp:
             fp.writelines(write_lines)

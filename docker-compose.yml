@@ -13,12 +13,14 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
-# --------------------------------------
+  # --------------------------------------
   migration:
     platform: linux/amd64
     container_name: migration
     build:
       context: ./services/migration
+      args:
+        - GEOM_VERSION=v0.1.1-alpha
     restart: on-failure
     # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
     environment:
