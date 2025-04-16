@@ -3,6 +3,10 @@
 # *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 FROM flyway/flyway AS runner
 
+# version of the archive for the geometry migration
+ARG GEOM_VERSION=v0.1.0-alpha
+
+# env vars
 ENV OPT_MIGRATION=/opt/migration
 
 # solving possible issue of APT behind a proxy
@@ -12,17 +16,36 @@ Acquire::http::No-Cache true;
 Acquire::BrokenProxy true;
 EOF
 
+#
 RUN apt-get update \
     && apt-get install -y postgis postgresql-client unzip curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# only get the main migrations into the image
+# the main migration into the image
 # local migrations for testing is defined in the docker-compose file
 COPY ./main /flyway/sql/main
 
+# set the working directory
+WORKDIR ${OPT_MIGRATION}
+
+# District Geometry used in a bash script migration
+COPY ./dist_geom ./dist_geom
+
+# add the release asset for the tagged version defined in GEOM_VERSION
+ADD https://github.com/USACE/usace-services-shared/releases/download/${GEOM_VERSION}/geometry.tar.gz ${OPT_MIGRATION}
+
+# decompress/expand archive and remove original download
+# if the archive was created with directories, move the files to the current directory
+RUN tar -xzvf geometry.tar.gz \
+    && rm -f geometry.tar.gz
+
 # staging data is for the usace schema; the default schema
+# mainly using this for local development and should be empty
 COPY ./staging $OPT_MIGRATION
+
+# entrypoint for flyway with arguments (CMD)
+WORKDIR /flyway
 
 ENTRYPOINT ["flyway"]
 
