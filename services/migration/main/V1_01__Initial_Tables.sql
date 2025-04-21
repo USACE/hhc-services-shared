@@ -1,3 +1,21 @@
+-- pgFormatter-ignore
+
+-- uuid extension needed for tables using uuid
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA ${flyway:defaultSchema};
+
+-- create the divisions, offices, and their relationship
+CREATE TABLE IF NOT EXISTS office(
+    id varchar(2) NOT NULL
+    , code varchar(3) NOT NULL
+    , symbol varchar(5) NOT NULL
+    , fullname varchar NOT NULL
+    , office_type varchar NOT NULL
+    , parent_id varchar(2)
+    , CONSTRAINT office_pk PRIMARY KEY (id)
+    , CONSTRAINT office_unique UNIQUE (code , fullname)
+    , CONSTRAINT office_parent_fk FOREIGN KEY (parent_id) REFERENCES office(id)
+);
+
 -- load District geometry
 CREATE TABLE IF NOT EXISTS office_aor_cw(
     id uuid NOT NULL DEFAULT uuid_generate_v4()

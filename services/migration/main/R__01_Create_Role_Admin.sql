@@ -1,21 +1,7 @@
 -- pgFormatter-ignore
--- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
--- create the gis_admin role
--- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
-DO $$
-BEGIN
-    CREATE USER gis_admin WITH ENCRYPTED PASSWORD '${GIS_PASSWORD}';
-EXCEPTION
-    WHEN DUPLICATE_OBJECT THEN
-        RAISE NOTICE 'not creating role gis_admin -- it already exists';
-END
-$$;
+-- ignore the formatter to not format the flyway placeholders
 
-ALTER ROLE gis_admin WITH SUPERUSER;
-
-ALTER ROLE gis_admin SET search_path = ${flyway:defaultSchema}, "public" , "tiger", "tiger_data";
-
-GRANT ALL PRIVILEGES ON DATABASE postgres TO gis_admin;
+-- Always re-apply roles  when running migrations: ${flyway:timestamp}
 
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 -- create the hhc_user, hhc_reader, and hhc_writer roles
@@ -57,7 +43,7 @@ REVOKE ALL ON flyway_schema_history FROM hhc_reader;
 
 REVOKE ALL ON flyway_schema_history FROM hhc_writer;
 
-ALTER ROLE hhc_user SET search_path = ${flyway:defaultSchema}, "public" , "tiger", "tiger_data";
+ALTER ROLE hhc_user SET search_path = ${flyway:defaultSchema}, "tiger", "tiger_data", "public";
 
 GRANT USAGE ON SCHEMA ${flyway:defaultSchema} TO hhc_user;
 

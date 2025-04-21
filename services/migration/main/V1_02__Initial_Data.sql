@@ -1,20 +1,3 @@
--- uuid extension needed for tables using uuid
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA ${flyway:defaultSchema};
-
--- create the divisions, offices, and their relationship
-CREATE TABLE IF NOT EXISTS office(
-    id varchar(2) NOT NULL
-    , code varchar(3) NOT NULL
-    , symbol varchar(5) NOT NULL
-    , fullname varchar NOT NULL
-    , office_type varchar NOT NULL
-    , parent_id varchar(2)
-    , CONSTRAINT office_pk PRIMARY KEY (id)
-    , CONSTRAINT office_unique UNIQUE (code , fullname)
-    , CONSTRAINT office_parent_fk FOREIGN KEY (parent_id) REFERENCES office(id)
-);
-
 -- populate the office table with divisions
 INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
     VALUES ('S0' , 'HQ' , 'HQ' , 'Headquarters' , 'HQ' , NULL)
@@ -30,8 +13,7 @@ INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
 
 -- populate the office table with districts
 INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
-    VALUES 
-     ('H1' , 'LRH' , 'CELRH' , 'Huntington District' , 'DIST' , 'H0')
+    VALUES ('H1' , 'LRH' , 'CELRH' , 'Huntington District' , 'DIST' , 'H0')
     ,('H2' , 'LRL' , 'CELRL' , 'Louisville District' , 'DIST' , 'H0')
     ,('H3' , 'LRN' , 'CELRN' , 'Nashville District' , 'DIST' , 'H0')
     ,('H4' , 'LRP' , 'CELRP' , 'Pittsburgh District' , 'DIST' , 'H0')
