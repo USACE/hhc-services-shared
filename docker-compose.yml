@@ -4,11 +4,6 @@ services:
     platform: linux/amd64
     image: postgis/postgis:latest
     container_name: hhc-db
-    # build:
-    #   context: ./services/database
-    #   args:
-    #     PG_MAJOR: 17
-    #     POSTGIS_MAJOR: 3
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
@@ -40,3 +35,6 @@ services:
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
 # --------------------------------------
+
+networks:
+  hhc_network:

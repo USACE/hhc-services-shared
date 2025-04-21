@@ -40,10 +40,6 @@ ADD https://github.com/USACE/hhc-services-shared/releases/download/${GEOM_VERSIO
 RUN tar -xzvf geometry.tar.gz \
     && rm -f geometry.tar.gz
 
-# staging data is for the hhc schema; the default schema
-# mainly using this for local development and should be empty
-# COPY ./staging $OPT_MIGRATION
-
 # entrypoint for flyway with arguments (CMD)
 WORKDIR /flyway
 
