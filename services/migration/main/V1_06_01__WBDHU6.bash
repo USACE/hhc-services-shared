@@ -2,10 +2,10 @@
 
 cd $OPT_MIGRATION
 
-unzip -o tl_2024_us_state.zip
+unzip -o wbdhu6.zip
 
-shp2pgsql -s 4269 -c -D -w tl_2024_us_state tiger_data.state >/tmp/tiger_state.sql
+shp2pgsql -s 4269 -c -D -w wbdhu6 hhc.wbdhu6 >/tmp/wbdhu6.sql
 
 # tiger data is gis_admin and I am hhc schema
 PGPASSWORD=${FLYWAY_PASSWORD} psql --host=${FLYWAY_DB_HOST} --port=5432 --username=${FP__flyway_user__} --dbname=${FP__flyway_database__} \
-    --file="/tmp/tiger_state.sql"
+    --file="/tmp/wbdhu6.sql"

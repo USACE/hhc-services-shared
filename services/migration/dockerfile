@@ -42,7 +42,7 @@ RUN tar -xzvf geometry.tar.gz \
 
 # staging data is for the hhc schema; the default schema
 # mainly using this for local development and should be empty
-COPY ./staging $OPT_MIGRATION
+# COPY ./staging $OPT_MIGRATION
 
 # entrypoint for flyway with arguments (CMD)
 WORKDIR /flyway
