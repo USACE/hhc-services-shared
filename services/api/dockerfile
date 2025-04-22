@@ -1,0 +1,41 @@
+ARG GO_VERSION=1.24
+
+# ----------------------------------------------------------------------
+# FROM build
+FROM golang:${GO_VERSION}-alpine AS gobuild
+
+RUN apk update \
+    && apk add --no-cache ca-certificates
+
+WORKDIR /opt/go/src
+
+COPY ./hhcshare ./
+
+# Install Dependencies
+RUN go mod download \
+    && go mod verify
+
+RUN echo $(grep nobody /etc/passwd) > /etc/passwd
+
+# ----------------------------------------------------------------------
+# IMAGE FOR DEVELOPMENT
+FROM gobuild AS development
+RUN go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go get github.com/go-delve/delve
+
+# ----------------------------------------------------------------------
+# IMAGE FOR PRODUCTION THAT SCRATCH USES
+FROM gobuild AS production
+RUN go build -ldflags="-w -s" -o /opt/go/bin/app
+
+# ----------------------------------------------------------------------
+# SCRATCH IMAGE
+FROM scratch
+COPY --from=production /opt/go/bin/app /app
+COPY --from=gobuild /etc_passwd /etc/passwd
+COPY --from=gobuild /etc/ssl/certs/ca-certificates.crt \
+    /etc/ssl/certs/ca-certificates.crt
+
+USER nobody
+
+ENTRYPOINT [ "/app" ]

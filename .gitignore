@@ -1,8 +1,10 @@
+# mac stuff
 **/*.DS_Store
 
-# sql files from the geometry generator python script
+# geometry tar and tar.zip files
 **/geom/*.sql
+**/geom/*.zip
+**/geom/*.tar.gz
 
-**/*.zip
-
-**/*.tar.gz
+# Go delve debugger files
+**/.config/dlv

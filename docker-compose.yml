@@ -1,5 +1,28 @@
 name: hhc-shared-stack
 services:
+  hhc-api:
+    build:
+      context: ./services/api
+      dockerfile: dockerfile
+      target: development
+    command: dlv debug /opt/go/src --headless --listen=:2345 --accept-multiclient
+    container_name: hhc-api
+    networks:
+      - hhc_network
+    restart: always
+    environment:
+      ADDRESS_PORT: 8080
+    ports:
+      - "8080:8080"
+      - "2345:2345"
+    volumes:
+      - ./services/api/hhcshare:/opt/go/src:rw
+    depends_on:
+      hhc-db:
+        condition: service_started
+      hhc-migration:
+        condition: service_completed_successfully
+  # --------------------------------------
   hhc-db:
     platform: linux/amd64
     image: postgis/postgis:latest

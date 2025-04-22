@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "remove debug_bin",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "${workspaceFolder}/services/api/hhcshare/__debug_bin*",
+                "${workspaceFolder}/services/api/hhcshare/.config",
+            ]
+        }
+    ]
+}
