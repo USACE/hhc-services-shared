@@ -8,3 +8,4 @@
 
 # Go delve debugger files
 **/.config/dlv
+**/__debug_bin*

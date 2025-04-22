@@ -18,17 +18,20 @@ func main() {
 	e.Use(middleware.CORS())
 	e.Use(middleware.Gzip())
 
+	// Groups
+	grp_api:=e.Group("api")
+
 	// ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 	// basic routes
 	// ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 	// Public Health Check Route
-	e.GET("/health",
+	grp_api.GET("/health",
 		func(c echo.Context) error {
 			return c.JSON(http.StatusOK, map[string]any{"status": "healthy"})
 		})
 
 	// API Routes
-	e.GET("/routes",
+	grp_api.GET("/routes",
 		func(c echo.Context) error { return c.JSON(http.StatusOK, e.Routes()) },
 	)
 
