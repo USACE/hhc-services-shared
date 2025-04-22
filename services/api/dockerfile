@@ -32,7 +32,7 @@ RUN go build -ldflags="-w -s" -o /opt/go/bin/app
 # SCRATCH IMAGE
 FROM scratch
 COPY --from=production /opt/go/bin/app /app
-COPY --from=gobuild /etc_passwd /etc/passwd
+COPY --from=gobuild /etc/passwd /etc/passwd
 COPY --from=gobuild /etc/ssl/certs/ca-certificates.crt \
     /etc/ssl/certs/ca-certificates.crt
 
