@@ -1,0 +1,23 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Application API",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "debugAdapter": "dlv-dap",
+      "port": 2345,
+      "substitutePath": [
+        {
+          "from": "${workspaceFolder}/services/api/hhcshare",
+          "to": "/opt/go/src"
+        }
+      ],
+      "postDebugTask": "remove debug_bin"
+    }
+  ]
+}
