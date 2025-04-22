@@ -1,6 +1,18 @@
+# Flyway Migration Placeholders
+
+Flyway comes with support for placeholder replacement in:
+
+- SQL migrations
+- Script migrations
+
+[migration-placeholder](https://documentation.red-gate.com/flyway/flyway-concepts/migrations/migration-placeholders)
+
+[placeholder-namespace](https://documentation.red-gate.com/flyway/reference/configuration/flyway-namespace/flyway-placeholders-namespace)
+
+
 # Instructions Building/Updating `geometry.tar.gz`
 
-Due to file size limitations (>100MB) for GitHub repositories, large geometry files supporting the Flyway migration are offloaded to the repository's release assets.  Assets are collected in a `tar.gz` file and associated with a tagged release.  Developing locally with needs for large files supporting new migrations will require a download of the asset making sure you have to most up-to-date set of files.  Make sure to include any new files and update the asset in the release.
+Due to file size limitations (>100MB) for GitHub repositories, large geometry files supporting the Flyway migration are offloaded to the repository's release assets.  Assets are collected in a `tar.gz` file and associated with a tagged release.  Developing locally with needs for large files supporting new migrations will require a download of the asset making sure you have the most up-to-date set of files.  Make sure to include any new files and update the asset in the release.
 
 # Create the Tar gzip
 
