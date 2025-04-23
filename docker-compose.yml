@@ -8,13 +8,13 @@ services:
     command: dlv debug /opt/go/src --headless --listen=:2345 --accept-multiclient
     container_name: hhc-api
     networks:
-      - hhc_network
+      - hhc-network
     restart: always
     environment:
       ADDRESS_PORT: 8080
-    ports:
-      - "8080:8080"
-      - "2345:2345"
+    # ports:
+    #   - "8080:8080"
+      # - "2345:2345"
     volumes:
       - ./services/api/hhcshare:/opt/go/src:rw
     depends_on:
@@ -27,6 +27,8 @@ services:
     platform: linux/amd64
     image: postgis/postgis:latest
     container_name: hhc-db
+    networks:
+      - hhc-network
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
@@ -35,11 +37,13 @@ services:
   # --------------------------------------
   hhc-migration:
     platform: linux/amd64
-    container_name: hhc-migration
     build:
       context: ./services/migration
       args:
         - GEOM_VERSION=v0.1.1-alpha
+    container_name: hhc-migration
+    networks:
+      - hhc-network
     restart: on-failure
     # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
     environment:
@@ -52,11 +56,12 @@ services:
       FLYWAY_VALIDATE_MIGRATION_NAMING: true
       PGHOST: hhc-db
       FLYWAY_PLACEHOLDERS_APP_PASSWORD: app_pass
-    depends_on:
-      - hhc-db
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
+    depends_on:
+      - hhc-db
 # --------------------------------------
 
 networks:
-  hhc_network:
+  hhc-network:
+    name: hhc-network
