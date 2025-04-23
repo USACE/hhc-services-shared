@@ -1,0 +1,7 @@
+{
+  "pgFormatter.commaEnd": false,
+  "pgFormatter.commaStart": true,
+  "pgFormatter.functionCase": "lowercase",
+  "pgFormatter.spaces": 4,
+  "notebook.defaultFormatter": "ms-python.black-formatter",
+}
