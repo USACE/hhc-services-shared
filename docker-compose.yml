@@ -59,7 +59,8 @@ services:
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
     depends_on:
-      - hhc-db
+      hhc-db:
+        condition: service_started
 # --------------------------------------
 
 networks:
