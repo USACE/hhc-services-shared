@@ -14,7 +14,7 @@ services:
       ADDRESS_PORT: 8080
     # ports:
     #   - "8080:8080"
-      # - "2345:2345"
+    # - "2345:2345"
     volumes:
       - ./services/api/hhcshare:/opt/go/src:rw
     depends_on:
@@ -34,6 +34,11 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 1s
+      retries: 5
   # --------------------------------------
   hhc-migration:
     platform: linux/amd64
@@ -48,19 +53,17 @@ services:
     # entrypoint: ["sleep", "infinity"] # use this to jump into the container to check things
     environment:
       FLYWAY_DEFAULT_SCHEMA: hhc
-      FLYWAY_EDITION: community
-      FLYWAY_LOCATIONS: filesystem:/flyway/sql
       FLYWAY_USER: postgres
       FLYWAY_PASSWORD: postgres
       FLYWAY_URL: jdbc:postgresql://hhc-db:5432/postgres
       FLYWAY_VALIDATE_MIGRATION_NAMING: true
       PGHOST: hhc-db
-      FLYWAY_PLACEHOLDERS_APP_PASSWORD: app_pass
+      FLYWAY_PLACEHOLDERS_APP_PASSWORD: hhc_pass
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
     depends_on:
       hhc-db:
-        condition: service_started
+        condition: service_healthy
 # --------------------------------------
 
 networks:

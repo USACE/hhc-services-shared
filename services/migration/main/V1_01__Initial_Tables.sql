@@ -1,7 +1,7 @@
 -- pgFormatter-ignore
 
 -- uuid extension needed for tables using uuid
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA ${flyway:defaultSchema};
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 -- create the divisions, offices, and their relationship
 CREATE TABLE IF NOT EXISTS office(
