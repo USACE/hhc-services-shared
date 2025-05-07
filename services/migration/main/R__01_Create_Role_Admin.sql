@@ -35,17 +35,25 @@ END
 $$;
 
 -- GRANT for default schema roles
-GRANT SELECT ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO hhc_reader;
 
-GRANT INSERT , UPDATE , DELETE ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO hhc_writer;
+GRANT SELECT ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO hhc_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA tiger_data TO hhc_reader;
+
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO hhc_writer;
 
 REVOKE ALL ON flyway_schema_history FROM hhc_reader;
-
 REVOKE ALL ON flyway_schema_history FROM hhc_writer;
 
-ALTER ROLE hhc_user SET search_path = ${flyway:defaultSchema}, "tiger", "tiger_data", "public";
+GRANT hhc_reader, hhc_writer TO hhc_user;
 
 GRANT USAGE ON SCHEMA ${flyway:defaultSchema} TO hhc_user;
 
-GRANT hhc_reader , hhc_writer TO hhc_user;
+GRANT USAGE ON SCHEMA tiger_data TO hhc_user;
 
+-- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
+-- create the hhc_user, hhc_reader, and hhc_writer roles
+-- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
+GRANT SELECT ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO PUBLIC;
+REVOKE ALL ON flyway_schema_history FROM PUBLIC;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA tiger_data TO PUBLIC;

@@ -3,6 +3,10 @@
 # *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 FROM flyway/flyway AS runner
 
+# env vars for FLYWAY
+ENV FLYWAY_EDITION=community
+ENV FLYWAY_LOCATIONS=filesystem:/flyway/sql
+
 # version of the archive for the geometry migration
 ARG GEOM_VERSION=v0.1.1-alpha
 
