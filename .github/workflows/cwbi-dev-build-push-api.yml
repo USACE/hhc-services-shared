@@ -11,8 +11,12 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: aws-us-gov #Change to reflect your Region
-
+  AWS_REGION: us-gov-west-1 #Change to reflect your Region
+  ROLE_TO_ASSUME: arn:aws-us-gov:iam::718787032875:role/github-actions-ecr-hhc-shared
+  ECR_REPOSITORY: hhc-shared-api
+  IMAGE_TAG: dev
+  PATH_TO_DOCKERFILE: services/api
+  
 # Permission can be added at job level or workflow level
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -26,8 +30,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-gov-west-1
-          role-to-assume: arn:aws-us-gov:iam::718787032875:role/github-actions-ecr-hhc-shared
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
           output-credentials: true
       # Hello from AWS: WhoAmI
       - name: Sts GetCallerIdentity
@@ -41,14 +45,11 @@ jobs:
       - name: Build Image; Push to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: hhc-shared-api
-          IMAGE_TAG: latest
         run: |
-          docker build services/api \
-          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-          --tag $ECR_REGISTRY/$ECR_REPOSITORY:dev 
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:dev
+          docker build --push \
+          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
+          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+          ${{ env.PATH_TO_DOCKERFILE }}
       - name: ECR Logout
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
