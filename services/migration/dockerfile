@@ -1,7 +1,8 @@
 # *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 # FROM runner running flyway with the shapefiles
 # *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
-FROM ghcr.io/cwbi-apps/flyway:latest AS runner
+FROM flyway/flyway:latest AS runner
+# FROM ghcr.io/cwbi-apps/flyway:latest AS runner
 
 # env vars for FLYWAY
 ENV FLYWAY_EDITION=community
@@ -14,8 +15,18 @@ ARG GEOM_VERSION=v0.1.1-alpha
 ENV OPT_MIGRATION=/opt/migration
 
 #
-RUN apk update \
-    && apk add postgis postgresql-client unzip curl
+# RUN apk update \
+#     && apk add postgis unzip curl
+
+# solving possible issue of APT behind a proxy
+RUN cat <<EOF > /etc/apt/apt.conf.d/99proxy
+Acquire::http::Pipeline-Depth 0;
+Acquire::http::No-Cache true;
+Acquire::BrokenProxy true;
+EOF
+
+RUN apt-get update \
+    && apt-get install -y postgis unzip curl
 
 # the main migration into the image
 # local migrations for testing is defined in the docker-compose file

@@ -42,7 +42,7 @@ func main() {
 	// ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 	// start server
 	// ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
-	port, hasPort := os.LookupEnv("ADDRESS_PORT")
+	port, hasPort := os.LookupEnv("API_PORT")
 	if !hasPort || port == "" {
 		port = "8080"
 	}

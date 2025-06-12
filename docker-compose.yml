@@ -11,12 +11,24 @@ services:
       - hhc-network
     restart: always
     environment:
-      ADDRESS_PORT: 8080
+      PGUSER: hhc_shared_user
+      PGPASSWORD: hhc_shared_pass
+      PGDATABASE: postgres
+      PGHOST: hhc-db
+      PGSSLMODE: disable # api config defaults to 'require'
+      PGX_POOL_MAXCONNS: 10
+      PGX_POOL_MINCONNS: 5
+      PGX_POOL_MAXCONN_IDLETIME: 30m
+      S3_BUCKET: hhc-shared-dev
+      S3_DEFAULT_INDEX: index.html
+      S3_PREFIX_STATIC: /shared/ui
+      API_PORT: 8080
+      API_LOG: true
     # ports:
     #   - "8080:8080"
     # - "2345:2345"
-    volumes:
-      - ./services/api/hhcshare:/opt/go/src:rw
+    # volumes:
+    #   - ./services/api/hhcshare:/opt/go/src:rw
     depends_on:
       hhc-db:
         condition: service_started
@@ -58,8 +70,8 @@ services:
       FLYWAY_URL: jdbc:postgresql://hhc-db:5432/postgres
       FLYWAY_VALIDATE_MIGRATION_NAMING: true
       PGHOST: hhc-db
-      FLYWAY_PLACEHOLDERS_APP_PASSWORD: hhc_pass
       FLYWAY_PLACEHOLDERS_APP_USER: hhc_shared_user
+      FLYWAY_PLACEHOLDERS_APP_PASSWORD: hhc_shared_pass
     volumes:
       - ./services/migration/local:/flyway/sql/local:ro
     depends_on:
