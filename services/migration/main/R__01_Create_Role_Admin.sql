@@ -45,10 +45,7 @@ GRANT hhc_shared_reader, hhc_shared_writer TO ${APP_USER};
 
 GRANT USAGE ON SCHEMA ${flyway:defaultSchema} TO ${APP_USER};
 
-ALTER ROLE ${APP_USER} SET search_path = ${flyway:defaultSchema};
-
-GRANT SELECT ON ALL TABLES IN SCHEMA ${flyway:defaultSchema} TO PUBLIC;
-REVOKE ALL ON flyway_schema_history FROM PUBLIC;
+ALTER ROLE ${APP_USER} SET search_path = public, ${flyway:defaultSchema};
 
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 -- granting for tiger_data with a check the schema exists
@@ -56,29 +53,19 @@ REVOKE ALL ON flyway_schema_history FROM PUBLIC;
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'tiger_data') THEN
-        EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA tiger_data TO hhc_shared_reader;';
-    ELSE
-        RAISE EXCEPTION 'Schema hhc does not exist. Grant SELECT TO hhc_shared_reader failed.';
-    END IF;
-END
-$$;
-
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'tiger_data') THEN
-        EXECUTE 'GRANT USAGE ON SCHEMA tiger_data TO ${APP_USER};';
-    ELSE
-        RAISE EXCEPTION 'Schema hhc does not exist. Grant GRANT USAGE failed.';
-    END IF;
-END
-$$;
-
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'tiger_data') THEN
         EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA tiger_data TO PUBLIC;';
     ELSE
-        RAISE EXCEPTION 'Schema hhc does not exist. Grant GRANT SELECT TO PUBLIC failed.';
+        RAISE EXCEPTION 'Schema hhc does not exist. Grant SELECT TO PUBLIC failed.';
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'tiger_data') THEN
+        EXECUTE 'GRANT USAGE ON SCHEMA tiger_data TO PUBLIC;';
+    ELSE
+        RAISE EXCEPTION 'Schema hhc does not exist. GRANT USAGE failed.';
     END IF;
 END
 $$;

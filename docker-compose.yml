@@ -53,11 +53,10 @@ services:
       retries: 5
   # --------------------------------------
   hhc-migration:
-    platform: linux/amd64
     build:
       context: ./services/migration
       args:
-        - GEOM_VERSION=v0.1.1-alpha
+        - GEOM_VERSION=v0.1.1-alpha # v0.1.1-alpha is the default in the dockerfile
     container_name: hhc-migration
     networks:
       - hhc-network
