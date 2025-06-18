@@ -56,7 +56,7 @@ services:
     build:
       context: ./services/migration
       args:
-        - GEOM_VERSION=v0.1.1-alpha # v0.1.1-alpha is the default in the dockerfile
+        - GEOM_VERSION=v0.1.1 # v0.1.1 is the default in the dockerfile
     container_name: hhc-migration
     networks:
       - hhc-network

@@ -2,7 +2,7 @@
 
 cd $OPT_MIGRATION
 
-unzip -o tl_2024_us_state.zip
+tar -xzvf tl_2024_us_state.tar.gz
 
 shp2pgsql -s 4269 -c -D -w tl_2024_us_state tiger_data.state >/tmp/tiger_state.sql
 
