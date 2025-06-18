@@ -1,4 +1,8 @@
-USAGE: shp2pgsql [<options>] <shapefile> [[<schema>.]<table>]
+# USAGE: shp2pgsql
+
+```bash
+shp2pgsql [<options>] <shapefile> [[<schema>.]<table>]
+
 OPTIONS:
   -s [<from>:]<srid> Set the SRID field. Defaults to 0.
       Optionally reprojects from given SRID.
@@ -44,3 +48,4 @@ OPTIONS:
 
   An argument of `--' disables further option processing.
   (useful for unusual file names starting with '-')
+  ```

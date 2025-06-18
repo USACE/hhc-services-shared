@@ -1,6 +1,6 @@
-psql is the PostgreSQL interactive terminal.
+# USAGE: psql
 
-Usage:
+```bash
   psql [OPTION]... [DBNAME [USERNAME]]
 
 General options:
@@ -61,3 +61,4 @@ documentation.
 
 Report bugs to <pgsql-bugs@lists.postgresql.org>.
 PostgreSQL home page: <https://www.postgresql.org/>
+```
