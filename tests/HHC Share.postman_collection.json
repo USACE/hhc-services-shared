@@ -7,17 +7,48 @@
 	},
 	"item": [
 		{
-			"name": "Health",
+			"name": "List Offices",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{hostname}}/health",
+					"raw": "{{hostname}}/offices?a=full",
 					"host": [
 						"{{hostname}}"
 					],
 					"path": [
-						"health"
+						"offices"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "full"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Office Geometry",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{hostname}}/offices/:office/geometry",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"offices",
+						":office",
+						"geometry"
+					],
+					"variable": [
+						{
+							"key": "office",
+							"value": "lrn"
+						}
 					]
 				}
 			},
@@ -60,6 +91,11 @@
 		{
 			"key": "application_key",
 			"value": "appkey",
+			"type": "string"
+		},
+		{
+			"key": "jwt_admin",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiZTMwNjlkNi0xNzE3LTQ3M2YtOTE5Zi02NjZjZWM4NWNkNTAiLCJpc3MiOiJodHRwczovL2lkZW50aXR5LXRlc3QuY3diaS51cy9hdXRoL3JlYWxtcy9jd2JpIiwic3ViIjoiMzRkNzg5ZTAtYzQ2Yi00M2Q4LWEzZTMtYjdkNzgwOGJlYjNkIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibGRtIiwic2Vzc2lvbl9zdGF0ZSI6IjI0OWIwYTQ4LWU3NmMtNDlmMi1hODc5LWI4NjllYmQwYzFmYSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9hcHBzLnJzZ2lzLmRldiJdLCJyZXNvdXJjZV9hY2Nlc3MiOnsibGRtIjp7InJvbGVzIjpbIkFETUlOIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsInNpZCI6ImE2MGZkYTM1LWUxMTQtNDA1Mi1hYmRiLTNkYjQyOTYyOWQ1NiIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoibGFzdG5hbWUuZmlyc3RuYW1lLmluaXRpYWwuMTIzNDU2Nzg5IiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIn0.Ba4ShfuxHRtO-ILBxmNeRj2JE4ftD7roN8GgYY2Inys",
 			"type": "string"
 		}
 	]

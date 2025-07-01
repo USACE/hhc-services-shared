@@ -4,4 +4,6 @@
   "pgFormatter.functionCase": "lowercase",
   "pgFormatter.spaces": 4,
   "notebook.defaultFormatter": "ms-python.black-formatter",
+  "python-envs.defaultEnvManager": "ms-python.python:pyenv",
+  "python-envs.pythonProjects": [],
 }

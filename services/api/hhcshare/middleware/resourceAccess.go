@@ -26,11 +26,15 @@ type (
 		// Typically the office of the user defined in routes
 		Scope string
 
+		// Scope Variable
+		// Optional.  Default value "symbol"
+		ScopeVariable string
+
 		// ScopeFromContext func to get the scope
 		// Typically from the route and is most likely an office symbol
-		ScopeFromContext func(c echo.Context) error
+		ScopeFromContext func(c echo.Context, scopeVariable string) string
 
-		// Context key
+		// Context key.  Use this if jwtAuth sets something different than 'user'
 		// Optional.  Default value "user"
 		ContextKey string
 
@@ -51,14 +55,14 @@ func DefaultResourceAcessSkipper(echo.Context) bool {
 }
 
 // DefaultScopeFromContext
-func (r *ResourceAccessConfig) DefaultScopeFromContext(c echo.Context) error {
+func DefaultScopeFromContext(c echo.Context, scopeVariable string) string {
 	paramNames := c.ParamNames()
 	for _, name := range paramNames {
-		if name == r.ContextKey {
-			r.Scope = c.Param(name)
+		if name == scopeVariable {
+			return c.Param(name)
 		}
 	}
-	return nil
+	return ""
 }
 
 // AuthResourceAccessWithConfig
@@ -67,8 +71,12 @@ func ResourceAccessWithConfig(accessConfig ResourceAccessConfig) echo.Middleware
 		accessConfig.Skipper = DefaultResourceAccessConfig.Skipper
 	}
 
+	if accessConfig.ScopeVariable == "" {
+		accessConfig.ScopeVariable = "symbol"
+	}
+
 	if accessConfig.ScopeFromContext == nil {
-		accessConfig.ScopeFromContext = func(c echo.Context) error { return nil }
+		accessConfig.ScopeFromContext = DefaultScopeFromContext
 	}
 
 	if accessConfig.ContextKey == "" {
@@ -83,25 +91,28 @@ func ResourceAccessWithConfig(accessConfig ResourceAccessConfig) echo.Middleware
 			}
 
 			// define Scope from context func
-			if err = accessConfig.ScopeFromContext(c); err != nil {
-				return
+			if accessConfig.Scope == "" {
+				accessConfig.Scope = accessConfig.ScopeFromContext(c, accessConfig.ScopeVariable)
 			}
 
-			user := c.Get(accessConfig.ContextKey).(*jwt.Token)
-			
+			user, ok := c.Get(accessConfig.ContextKey).(*jwt.Token)
+			if !ok {
+				return fmt.Errorf("error getting %s from context", accessConfig.ContextKey)
+			}
+
 			claims, ok := user.Claims.(*AuthorizeCustomClaims)
 			if !ok {
-				return fmt.Errorf("error cast claims as jwt.MapClaims")
+				return fmt.Errorf("error cast claims")
 			}
 
 			resource_access := claims.ResourceAccess
 			// get the resources for the app and error if app not in map
-			app_roles, ok := resource_access[claims.AuthrorizedParty].(map[string]interface{})
+			app_roles, ok := resource_access[claims.AuthrorizedParty].(map[string]any)
 			if !ok {
 				return fmt.Errorf("failed to cast resource_access[app] as map[string]interface{}")
 			}
 
-			tokenRoles, ok := app_roles["roles"].([]interface{})
+			tokenRoles, ok := app_roles["roles"].([]any)
 			if !ok {
 				return fmt.Errorf("failed to cast app roles")
 			}
@@ -110,6 +121,7 @@ func ResourceAccessWithConfig(accessConfig ResourceAccessConfig) echo.Middleware
 			for _, tokenRole := range tokenRoles {
 				tokenRoleString := tokenRole.(string)
 				for _, authRole := range accessConfig.Roles {
+					authRole := strings.TrimSpace(authRole)
 					if accessConfig.RoleSeperator != "" {
 						scopeRole := strings.Split(tokenRoleString, accessConfig.RoleSeperator)
 						scope := scopeRole[0]

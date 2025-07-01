@@ -4,7 +4,8 @@ import string
 from pathlib import Path
 
 import requests
-from shapely.geometry import shape
+from shapely.geometry import MultiPolygon, Polygon, shape
+from shapely.wkt import dumps
 
 districts = {
     "H1": "LRH",
@@ -96,13 +97,21 @@ for dist_id, dist in districts.items():
                 f"INSERT INTO {schema}.{dbtable} (office_id, geom) VALUES "
             )
             feature = features[0]
-            geometry = feature.get("geometry")
-            geom_shape = shape(geometry)
-            wkt = geom_shape.wkt
+            feature_geometry = feature.get("geometry")
+            geometry = shape(feature_geometry)
 
-            write_lines.append(f"('{dist_id}', ST_GeomFromText('{wkt}', 4326))")
+            # checking geometry
+            if isinstance(geometry, Polygon):
+                multipolygon = MultiPolygon([geometry])
+            else:
+                multipolygon = geometry
+
+            multipolygon_wkt = dumps(multipolygon)
+
+            write_lines.append(
+                f"('{dist_id}', ST_GeomFromText('{multipolygon_wkt}', 4326))"
+            )
             write_lines.append(";\n")
 
         with filename.open("w") as fp:
             fp.writelines(write_lines)
-        # zipp.writestr(f"{dist}_mission_geom.sql", "".join(write_lines))

@@ -24,6 +24,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.21 // indirect
 	github.com/aws/smithy-go v1.22.3 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/huandu/go-sqlbuilder v1.35.1 // indirect
+	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -38,6 +40,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.4
 	github.com/aws/aws-sdk-go-v2/config v1.29.16
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.80.2
+	github.com/georgysavva/scany v1.2.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
