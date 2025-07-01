@@ -28,8 +28,8 @@ type (
 		// This is typically set by the middleware
 		PublicKey *rsa.PublicKey
 
-		// TokenRoles is the roles from the token
-		TokenRoles []interface{}
+		// TokenRoles is the role(s) from the token
+		TokenRoles []any
 
 		// SigningMethod is the signing method for the token algorithm
 		// Determined from the token
@@ -38,12 +38,12 @@ type (
 
 	// AuthorizeStandardClaims struct for ParseWithClaims
 	AuthorizeCustomClaims struct {
-		AuthrorizedParty  string                 `json:"azp,omitempty"`
-		ResourceAccess    map[string]interface{} `json:"resource_access,omitempty"`
-		PreferredUsername string                 `json:"preferred_username,omitempty"`
-		Name              string                 `json:"name,omitempty"`
-		GivenName         string                 `json:"given_name,omitempty"`
-		FamilyName        string                 `json:"family_name,omitempty"`
+		AuthrorizedParty  string         `json:"azp,omitempty"`
+		ResourceAccess    map[string]any `json:"resource_access,omitempty"`
+		PreferredUsername string         `json:"preferred_username,omitempty"`
+		Name              string         `json:"name,omitempty"`
+		GivenName         string         `json:"given_name,omitempty"`
+		FamilyName        string         `json:"family_name,omitempty"`
 		jwt.StandardClaims
 	}
 )
@@ -62,8 +62,8 @@ func DefaultJwtAuthSkipper(echo.Context) bool {
 // AuthParseWithClaims
 func (a *JwtAuthenticateConfig) AuthParseWithClaims() echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
-		ParseTokenFunc: func(c echo.Context, auth string) (interface{}, error) {
-			token, err := jwt.ParseWithClaims(auth, &AuthorizeCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		ParseTokenFunc: func(c echo.Context, auth string) (any, error) {
+			token, err := jwt.ParseWithClaims(auth, &AuthorizeCustomClaims{}, func(token *jwt.Token) (any, error) {
 				a.SigningMethod = token.Header["alg"].(string)
 				switch token.Method.(type) {
 				case *jwt.SigningMethodRSA:
