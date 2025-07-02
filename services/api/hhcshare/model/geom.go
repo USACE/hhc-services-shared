@@ -6,7 +6,9 @@ type FeatureCollection struct {
 }
 
 type Feature struct {
-	Geometry MultiPolygon `db:"geometry" json:"geometry"`
+	Type       string       `db:"-" json:"type"`
+	Properties Properties   `db:"properties" json:"properties"`
+	Geometry   MultiPolygon `db:"geometry" json:"geometry"`
 }
 
 type Properties struct {
@@ -32,4 +34,18 @@ type LineString struct {
 type MultiPolygon struct {
 	Type        string          `json:"type"`
 	Coordinates [][][][]float64 `json:"coordinates"`
+}
+
+// DefaultFeatureCollection
+func DefaultFeatureCollection() FeatureCollection {
+	var fc FeatureCollection
+	fc.Type = "FeatureCollection"
+	return fc
+}
+
+// DefaultFeature
+func DefaultFeature() Feature {
+	var f Feature
+	f.Type = "Feature"
+	return f
 }

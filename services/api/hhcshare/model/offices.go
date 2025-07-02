@@ -72,20 +72,26 @@ ORDER BY
 }
 
 // OfficeGeometry
-func OfficeGeometry(db *pgxpool.Pool, office string) (Feature, error) {
+func OfficeGeometry(db *pgxpool.Pool, office string) (FeatureCollection, error) {
 	var sql string = `
 SELECT
-	ST_AsGeoJSON(oac.geom)::json AS geometry
+	json_build_object('id' , o.id , 'code' , o.code , 'symbol' , o.symbol , 'fullname'
+	, o.fullname , 'office_type' , o.office_type , 'srid' , ST_SRID (oac.geom)) AS properties
+	, ST_AsGeoJSON (oac.geom)::json AS geometry
 FROM
 	office o
 	JOIN office_aor_cw oac ON oac.office_id = o.id
 WHERE
 	o.code = $1
 `
-	var feature Feature
+	fc := DefaultFeatureCollection()
+
+	feature := DefaultFeature()
 
 	err := pgxscan.Get(context.TODO(), db, &feature, sql, office)
 
-	return feature, err
+	fc.Features = append(fc.Features, feature)
+
+	return fc, err
 
 }
