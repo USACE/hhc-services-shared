@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -30,9 +31,29 @@ func (s HandlerStore) ListOffices(context echo.Context) error {
 
 // OfficeGOfficeGeometryeoJSON
 func (s HandlerStore) OfficeGeometry(context echo.Context) error {
-	office := context.Param("office")
-	officeLower := strings.ToUpper(office)
-	oo, err := model.OfficeGeometry(s.Connection, officeLower)
+	options := []string{"cw", "fuds", "mil", "reg"}
+	office := strings.ToUpper(context.Param("office"))
+	aor := strings.ToLower(context.QueryParam("aor"))
+	var aorTable string
+
+	// check the aor
+	if aor == "" {
+		aor = "cw"
+	}
+	isValid := false
+	for _, option := range options {
+		if aor == option {
+			isValid = true
+			aorTable = "office_aor_" + option
+			break
+		}
+	}
+	if !isValid {
+		msg := fmt.Sprintf("Mission option '%s' not available", aor)
+		return context.JSON(http.StatusInternalServerError, map[string]string{"message": msg})
+	}
+
+	oo, err := model.OfficeGeometry(s.Connection, office, aorTable)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}

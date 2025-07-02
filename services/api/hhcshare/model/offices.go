@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -72,20 +73,20 @@ ORDER BY
 }
 
 // OfficeGeometry
-func OfficeGeometry(db *pgxpool.Pool, office string) (FeatureCollection, error) {
-	var sql string = `
+func OfficeGeometry(db *pgxpool.Pool, office, aor string) (FeatureCollection, error) {
+	var sql string = fmt.Sprintf(`
 SELECT
 	json_build_object('id' , o.id , 'code' , o.code , 'symbol' , o.symbol , 'fullname'
-	, o.fullname , 'office_type' , o.office_type , 'srid' , ST_SRID (oac.geom)) AS properties
+	, o.fullname , 'office_type' , o.office_type , 'srid' , ST_SRID (oac.geom) , 'aor' , '%s') AS properties
 	, ST_AsGeoJSON (oac.geom)::json AS geometry
 FROM
 	office o
-	JOIN office_aor_cw oac ON oac.office_id = o.id
+	JOIN %s oac ON oac.office_id = o.id
 WHERE
 	o.code = $1
-`
-	fc := DefaultFeatureCollection()
+`, aor, aor)
 
+	fc := DefaultFeatureCollection()
 	feature := DefaultFeature()
 
 	err := pgxscan.Get(context.TODO(), db, &feature, sql, office)

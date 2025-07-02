@@ -35,7 +35,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{hostname}}/offices/:office/geometry",
+					"raw": "{{hostname}}/offices/:office/geometry?aor=cw",
 					"host": [
 						"{{hostname}}"
 					],
@@ -43,6 +43,12 @@
 						"offices",
 						":office",
 						"geometry"
+					],
+					"query": [
+						{
+							"key": "aor",
+							"value": "cw"
+						}
 					],
 					"variable": [
 						{

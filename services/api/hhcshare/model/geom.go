@@ -13,7 +13,8 @@ type Feature struct {
 
 type Properties struct {
 	Office
-	SRID int `db:"srid" json:"srid"`
+	SRID int    `db:"srid" json:"srid"`
+	AOR  string `db:"-" json:"aor"`
 }
 
 type Geometry struct {
