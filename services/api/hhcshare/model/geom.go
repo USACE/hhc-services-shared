@@ -9,14 +9,7 @@ type FeatureCollection struct {
 
 type Feature struct {
 	Type       string       `db:"-" json:"type"`
-	ID         string       `db:"id" json:"id"`
-	Code       string       `db:"code" json:"code"`
-	Symbol     string       `db:"symbol" json:"symbol"`
-	Fullname   string       `db:"fullname" json:"fullname"`
-	OfficeType string       `db:"office_type" json:"office_type"`
-	SRID       int          `db:"srid" json:"srid"`
-	AOR        string       `db:"aor" json:"aor"`
-	GeomId     uuid.UUID    `db:"geom_id" json:"-"`
+	Properties Properties   `db:"-" json:"properties"`
 	Geometry   MultiPolygon `db:"geometry" json:"geometry"`
 }
 

@@ -75,15 +75,28 @@ func OfficeGeometry(db *pgxpool.Pool, office string, aors []string) (FeatureColl
 
 	fc := DefaultFeatureCollection()
 
-	features := make([]Feature, 0)
-	err := pgxscan.Select(context.TODO(), db, &features, sql, args...)
+	rows, err := db.Query(context.TODO(), sql, args...)
 	if err != nil {
 		return fc, err
 	}
+	defer rows.Close()
 
-	for i := range features {
-		features[i].Type = "Feature"
+	features := make([]Feature, 0)
+	for rows.Next() {
+		var feature Feature
+		feature.Type = "Feature"
+		rows.Scan(&feature.Properties.ID, &feature.Properties.Code,
+			&feature.Properties.Symbol,
+			&feature.Properties.Fullname,
+			&feature.Properties.OfficeType,
+			&feature.Properties.SRID,
+			&feature.Properties.AOR,
+			&feature.Properties.GeomId,
+			&feature.Geometry,
+		)
+		features = append(features, feature)
 	}
+
 	fc.Features = features
 
 	return fc, nil
