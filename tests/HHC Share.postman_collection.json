@@ -12,17 +12,30 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{hostname}}/offices?a=full",
+					"raw": "{{hostname}}:{{api_port}}/api/offices",
 					"host": [
 						"{{hostname}}"
 					],
+					"port": "{{api_port}}",
 					"path": [
+						"api",
 						"offices"
 					],
 					"query": [
 						{
-							"key": "a",
-							"value": "full"
+							"key": "property",
+							"value": "office_aor",
+							"disabled": true
+						},
+						{
+							"key": "property",
+							"value": "parent_office",
+							"disabled": true
+						},
+						{
+							"key": "property",
+							"value": "office_aor,parent_office",
+							"disabled": true
 						}
 					]
 				}
@@ -35,11 +48,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{hostname}}/offices/:office/geometry?aor=cw",
+					"raw": "{{hostname}}:{{api_port}}/api/offices/:office/geometry?aor=fuds,regulatory",
 					"host": [
 						"{{hostname}}"
 					],
+					"port": "{{api_port}}",
 					"path": [
+						"api",
 						"offices",
 						":office",
 						"geometry"
@@ -47,13 +62,18 @@
 					"query": [
 						{
 							"key": "aor",
-							"value": "cw"
+							"value": "fuds,regulatory"
+						},
+						{
+							"key": "aor",
+							"value": "military,civil_works,fuds,regulatory",
+							"disabled": true
 						}
 					],
 					"variable": [
 						{
 							"key": "office",
-							"value": "lrn"
+							"value": "lrl"
 						}
 					]
 				}
@@ -91,7 +111,12 @@
 		},
 		{
 			"key": "hostname",
-			"value": "http://localhost:8080/api",
+			"value": "http://localhost",
+			"type": "string"
+		},
+		{
+			"key": "api_port",
+			"value": "8080",
 			"type": "string"
 		},
 		{

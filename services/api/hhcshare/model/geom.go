@@ -1,5 +1,7 @@
 package model
 
+import "github.com/gofrs/uuid"
+
 type FeatureCollection struct {
 	Type     string    `json:"type"`
 	Features []Feature `json:"features"`
@@ -7,14 +9,26 @@ type FeatureCollection struct {
 
 type Feature struct {
 	Type       string       `db:"-" json:"type"`
-	Properties Properties   `db:"properties" json:"properties"`
+	ID         string       `db:"id" json:"id"`
+	Code       string       `db:"code" json:"code"`
+	Symbol     string       `db:"symbol" json:"symbol"`
+	Fullname   string       `db:"fullname" json:"fullname"`
+	OfficeType string       `db:"office_type" json:"office_type"`
+	SRID       int          `db:"srid" json:"srid"`
+	AOR        string       `db:"aor" json:"aor"`
+	GeomId     uuid.UUID    `db:"geom_id" json:"-"`
 	Geometry   MultiPolygon `db:"geometry" json:"geometry"`
 }
 
 type Properties struct {
-	Office
-	SRID int    `db:"srid" json:"srid"`
-	AOR  string `db:"-" json:"aor"`
+	ID         string    `db:"id" json:"id"`
+	Code       string    `db:"code" json:"code"`
+	Symbol     string    `db:"symbol" json:"symbol"`
+	Fullname   string    `db:"fullname" json:"fullname"`
+	OfficeType string    `db:"office_type" json:"office_type"`
+	SRID       int       `db:"srid" json:"srid"`
+	AOR        string    `db:"-" json:"aor"`
+	GeomId     uuid.UUID `db:"geom_id" json:"-"`
 }
 
 type Geometry struct {

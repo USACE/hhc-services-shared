@@ -2,9 +2,10 @@ package model
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/georgysavva/scany/pgxscan"
+	"github.com/gofrs/uuid"
+	"github.com/huandu/go-sqlbuilder"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -16,83 +17,75 @@ type Office struct {
 	OfficeType string `db:"office_type" json:"office_type"`
 }
 
+type OfficeAor struct {
+	OfficeAorCw   *uuid.UUID `json:"cw"  `
+	OfficeAorFuds *uuid.UUID `json:"fuds"`
+	OfficeAorMil  *uuid.UUID `json:"mil" `
+	OfficeAorReg  *uuid.UUID `json:"reg" `
+}
+
 type OfficeFull struct {
 	Office
-	ParentOffice Office `db:"parent_office" json:"parent_office"`
+	OfficeAor    *OfficeAor `db:"office_aor" json:"office_aor,omitempty"`
+	ParentOffice *Office    `db:"parent_office" json:"parent_office,omitempty"`
 }
 
 // ListOffices
-func ListOffices(db *pgxpool.Pool) ([]Office, error) {
-	var sql string = `
-SELECT
-	o.id
-	, o.code
-	, o.symbol
-	, o.fullname
-	, o.office_type
-FROM
-	office o
-WHERE
-	o.parent_id IS NOT NULL
-	AND (o.office_type = 'DIST'
-		OR o.office_type = 'MSC')
-ORDER BY
-	o.id
-`
-	oo := make([]Office, 0)
-	err := pgxscan.Select(context.TODO(), db, &oo, sql)
+func ListOffices(db *pgxpool.Pool, cnames []string) ([]OfficeFull, error) {
+	// adding the base column names and any from inputs
+	col := []string{"id", "code", "symbol", "fullname", "office_type"}
+	col = append(col, cnames...)
 
-	return oo, err
-}
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select(col...)
+	sb.From("v_offices_with_geom_id")
 
-// ListOfficesFull
-func ListOfficesFull(db *pgxpool.Pool) ([]OfficeFull, error) {
-	var sql string = `
-SELECT
-	o.id
-	, o.code
-	, o.symbol
-	, o.fullname
-	, o.office_type
-	, json_build_object('id' , p.id , 'code' , p.code , 'symbol' , p.symbol ,
-	'fullname' , p.fullname, 'office_type', p.office_type ) AS parent_office
-FROM
-	office o
-	JOIN office p ON p.id = o.parent_id
-WHERE
-	o.parent_id IS NOT NULL
-	AND (o.office_type = 'DIST'
-		OR o.office_type = 'MSC')
-ORDER BY
-	o.id
-`
-	oo := make([]OfficeFull, 0)
-	err := pgxscan.Select(context.TODO(), db, &oo, sql)
+	sql, _ := sb.Build()
 
-	return oo, err
+	var offices []OfficeFull
+	if err := pgxscan.Select(context.TODO(), db, &offices, sql); err != nil {
+		return nil, err
+	}
+
+	return offices, nil
 }
 
 // OfficeGeometry
-func OfficeGeometry(db *pgxpool.Pool, office, aor string) (FeatureCollection, error) {
-	var sql string = fmt.Sprintf(`
-SELECT
-	json_build_object('id' , o.id , 'code' , o.code , 'symbol' , o.symbol , 'fullname'
-	, o.fullname , 'office_type' , o.office_type , 'srid' , ST_SRID (oac.geom) , 'aor' , '%s') AS properties
-	, ST_AsGeoJSON (oac.geom)::json AS geometry
-FROM
-	office o
-	JOIN %s oac ON oac.office_id = o.id
-WHERE
-	o.code = $1
-`, aor, aor)
+func OfficeGeometry(db *pgxpool.Pool, office string, aors []string) (FeatureCollection, error) {
+	sb := sqlbuilder.PostgreSQL.NewSelectBuilder()
+
+	sb.Select("id", "code", "symbol", "fullname", "office_type", "srid", "aor", "geom_id", "geometry")
+	sb.From("m_office_geojson_3857")
+	sb.Where(
+		sb.Equal("code", office),
+	)
+
+	switch len(aors) {
+	case 1:
+		sb.Where(sb.Equal("aor", aors[0]))
+	case 2:
+		sb.Where(sb.Or(sb.Equal("aor", aors[0]), sb.Equal("aor", aors[1])))
+	case 3:
+		sb.Where(sb.Or(sb.Equal("aor", aors[0]), sb.Equal("aor", aors[1]), sb.Equal("aor", aors[2])))
+	case 4:
+		sb.Where(sb.Or(sb.Equal("aor", aors[0]), sb.Equal("aor", aors[1]), sb.Equal("aor", aors[2]), sb.Equal("aor", aors[3])))
+	}
+
+	sql, args := sb.Build()
 
 	fc := DefaultFeatureCollection()
-	feature := DefaultFeature()
 
-	err := pgxscan.Get(context.TODO(), db, &feature, sql, office)
+	features := make([]Feature, 0)
+	err := pgxscan.Select(context.TODO(), db, &features, sql, args...)
+	if err != nil {
+		return fc, err
+	}
 
-	fc.Features = append(fc.Features, feature)
+	for i := range features {
+		features[i].Type = "Feature"
+	}
+	fc.Features = features
 
-	return fc, err
+	return fc, nil
 
 }

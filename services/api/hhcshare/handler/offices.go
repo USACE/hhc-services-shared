@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -12,16 +11,21 @@ import (
 
 // ListOffices
 func (s HandlerStore) ListOffices(context echo.Context) error {
-	a := context.QueryParam("a")
+	allowed := []string{"office_aor", "parent_office"}
+	filtered := make([]string, 0)
 
-	var oo any
-	var err error
-
-	if strings.ToLower(a) == "full" {
-		oo, err = model.ListOfficesFull(s.Connection)
-	} else {
-		oo, err = model.ListOffices(s.Connection)
+	// get the column names, split on comma, trim spaces, and add to filtered if allowed
+	n := context.QueryParam("property")
+	for n := range strings.SplitSeq(n, ",") {
+		nt := strings.TrimSpace(n)
+		for _, a := range allowed {
+			if a == nt {
+				filtered = append(filtered, nt)
+			}
+		}
 	}
+
+	oo, err := model.ListOffices(s.Connection, filtered)
 
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -29,31 +33,26 @@ func (s HandlerStore) ListOffices(context echo.Context) error {
 	return context.JSON(http.StatusOK, oo)
 }
 
-// OfficeGOfficeGeometryeoJSON
+// OfficeGeometry
 func (s HandlerStore) OfficeGeometry(context echo.Context) error {
-	options := []string{"cw", "fuds", "mil", "reg"}
+	allowed := []string{"military", "civil_works", "fuds", "regulatory"}
 	office := strings.ToUpper(context.Param("office"))
-	aor := strings.ToLower(context.QueryParam("aor"))
-	var aorTable string
 
-	// check the aor
-	if aor == "" {
-		aor = "cw"
-	}
-	isValid := false
-	for _, option := range options {
-		if aor == option {
-			isValid = true
-			aorTable = "office_aor_" + option
-			break
+	filtered := make([]string, 0)
+	aors := context.QueryParam("aor")
+	for aor := range strings.SplitSeq(aors, ",") {
+		aort := strings.TrimSpace(aor)
+		for _, a := range allowed {
+			if a == aort {
+				filtered = append(filtered, aort)
+			}
 		}
 	}
-	if !isValid {
-		msg := fmt.Sprintf("Mission option '%s' not available", aor)
-		return context.JSON(http.StatusInternalServerError, map[string]string{"message": msg})
-	}
 
-	oo, err := model.OfficeGeometry(s.Connection, office, aorTable)
+	if len(filtered) == 0 {
+		filtered = append(filtered, "civil_works")
+	}
+	oo, err := model.OfficeGeometry(s.Connection, office, filtered)
 	if err != nil {
 		return context.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
