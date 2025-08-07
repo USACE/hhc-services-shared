@@ -4,8 +4,8 @@ services:
     build:
       context: ./services/api
       dockerfile: dockerfile
-      target: development
-    command: dlv debug /opt/go/src --headless --listen=:2345 --accept-multiclient
+    #   target: development
+    # command: dlv debug /opt/go/src --accept-multiclient --headless --listen ":2345" --continue
     container_name: hhc-api
     networks:
       - hhc-network
@@ -24,9 +24,9 @@ services:
       S3_PREFIX_STATIC: /shared/ui
       API_PORT: 8080
       API_LOG: true
-    ports:
-      - "8080:8080"
-      - "2345:2345"
+    # ports:
+    #   - "8080:8080"
+    #   - "2345:2345"
     volumes:
       - ./services/api/hhcshare:/opt/go/src:rw
     depends_on:

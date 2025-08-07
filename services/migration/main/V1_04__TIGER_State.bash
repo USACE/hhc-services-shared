@@ -4,7 +4,7 @@ cd $OPT_MIGRATION
 
 tar -xzvf tl_2024_us_state.tar.gz
 
-shp2pgsql -s 4326 -c -D -w tl_2024_us_state tiger_data.state >/tmp/tiger_state.sql
+shp2pgsql -s 4269:4326 -c -D -w tl_2024_us_state tiger_data.state >/tmp/tiger_state.sql
 
 # tiger data is gis_admin and I am hhc schema
 PGPASSWORD=${FLYWAY_PASSWORD} psql --host=${PGHOST} --port=5432 --username=${FLYWAY_USER} --dbname=${FP__flyway_database__} \
