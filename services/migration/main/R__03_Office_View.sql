@@ -1,6 +1,8 @@
 -- pgFormatter-ignore
 -- ignore the formatter to not format the flyway placeholders
 
+-- Always re-apply roles  when running migrations: ${flyway:timestamp}
+
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 -- materialized views providing transformed geometries
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*

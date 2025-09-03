@@ -1,6 +1,8 @@
 -- pgFormatter-ignore
 -- ignore the formatter to not format the flyway placeholders
 
+-- Always re-apply roles  when running migrations: ${flyway:timestamp}
+
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 -- materialized views providing transformed geometries
 -- *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
@@ -64,7 +66,7 @@ SELECT
     , oac.id AS geom_id
     , ST_AsGeoJSON(ST_Transform(oac.geom , 3857))::json AS geometry
 FROM
-    office o
+    hhc.office o
     JOIN office_aor_cw oac ON oac.office_id = o.id
 UNION ALL
 SELECT
@@ -78,7 +80,7 @@ SELECT
     , oac.id AS geom_id
     , ST_AsGeoJSON(ST_Transform(oac.geom , 3857))::json AS geometry
 FROM
-    office o
+    hhc.office o
     JOIN office_aor_fuds oac ON oac.office_id = o.id
 UNION ALL
 SELECT
@@ -92,7 +94,7 @@ SELECT
     , oac.id AS geom_id
     , ST_AsGeoJSON(ST_Transform(oac.geom , 3857))::json AS geometry
 FROM
-    office o
+    hhc.office o
     JOIN office_aor_mil oac ON oac.office_id = o.id
 UNION ALL
 SELECT
@@ -106,7 +108,7 @@ SELECT
     , oac.id AS geom_id
     , ST_AsGeoJSON(ST_Transform(oac.geom , 3857))::json AS geometry
 FROM
-    office o
+    hhc.office o
     JOIN office_aor_reg oac ON oac.office_id = o.id;
 
 GRANT SELECT ON ${flyway:defaultSchema}.m_office_geojson_3857 TO hhc_shared_reader;
