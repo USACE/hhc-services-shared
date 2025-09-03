@@ -9,7 +9,9 @@ INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)
     ,('K0' , 'SAD' , 'CESAD' , 'South Atlantic Division' , 'MSC' , 'S0')
     ,('L0' , 'SPD' , 'CESPD' , 'South Pacific Division' , 'MSC' , 'S0')
     ,('M0' , 'SWD' , 'CESWD' , 'Southwestern Division' , 'MSC' , 'S0')
-    ,('N0' , 'TAD' , 'CETAD' , 'Trans Atlantic Division' , 'MSC' , 'S0');
+    ,('N0' , 'TAD' , 'CETAD' , 'Trans Atlantic Division' , 'MSC' , 'S0')
+    ,('Q0' , 'IWR' , 'CEIWR' , 'Institute For Water Resources' , 'OTHER' , 'S0')
+    ,('U4' , 'ERDC' , 'CEERDC' , 'Engineer Research and Development Center' , 'OTHER' , 'S0');
 
 -- populate the office table with districts
 INSERT INTO office(id , code , symbol , fullname , office_type , parent_id)

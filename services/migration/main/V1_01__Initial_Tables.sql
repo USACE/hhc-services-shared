@@ -6,8 +6,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 -- create the divisions, offices, and their relationship
 CREATE TABLE IF NOT EXISTS office(
     id varchar(2) NOT NULL
-    , code varchar(3) NOT NULL
-    , symbol varchar(5) NOT NULL
+    , code varchar NOT NULL
+    , symbol varchar NOT NULL
     , fullname varchar NOT NULL
     , office_type varchar NOT NULL
     , parent_id varchar(2)
