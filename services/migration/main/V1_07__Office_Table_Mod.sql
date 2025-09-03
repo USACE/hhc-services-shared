@@ -5,9 +5,9 @@
 
 -- these views will be added back in the repeatable migrations
 
-DROP MATERIALIZED VIEW m_office_geojson_3857;
+DROP MATERIALIZED VIEW IF EXISTS m_office_geojson_3857;
 
-DROP VIEW v_offices_with_geom_id;
+DROP VIEW IF EXISTS v_offices_with_geom_id;
 
 -- remove the character length restrictions on the office table
 -- for columns 'code' and 'symbol'
