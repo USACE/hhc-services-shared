@@ -44,7 +44,10 @@ type (
 		Name              string         `json:"name,omitempty"`
 		GivenName         string         `json:"given_name,omitempty"`
 		FamilyName        string         `json:"family_name,omitempty"`
-		jwt.StandardClaims
+		Subject           string         `json:"sub,omitempty"`
+		Audience          []string       `json:"aud,omitempty"`
+		// jwt.StandardClaims  // this is for 'aud' that is a string
+		jwt.MapClaims  // start using this with custom claims
 	}
 )
 
