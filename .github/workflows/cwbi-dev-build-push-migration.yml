@@ -3,11 +3,11 @@ name: Build DB Migration Image, Push to Dev
 
 # Controls when the action will run. Invokes the workflow on push events but only for the main branch
 on:
-  push:
-    branches: [cwbi-dev]
-    paths:
-      - .github/workflows/cwbi-dev-build-push-migration.yml
-      - 'services/migration/**'
+  # push:
+  #   branches: [cwbi-dev]
+  #   paths:
+  #     - .github/workflows/cwbi-dev-build-push-migration.yml
+  #     - 'services/migration/**'
   workflow_dispatch:
 
 env:
