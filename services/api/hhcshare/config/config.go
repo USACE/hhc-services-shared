@@ -23,7 +23,7 @@ type Config struct {
 	PgxPoolMaxconns        int           `env:"PGX_POOL_MAXCONNS" envDefault:"10"`
 	PgxPoolMinconns        int           `env:"PGX_POOL_MINCONNS" envDefault:"5"`
 	PgxPoolMaxconnIdletime time.Duration `env:"PGX_POOL_MAXCONN_IDLETIME" envDefault:"30m"`
-	S3Bucket               string        `env:"S3_BUCKET"`
+	S3Bucket               string        `env:"S3_BUCKET,required"`
 	S3DefaultIndex         string        `env:"S3_DEFAULT_INDEX" envDefault:"index.html"`
 	S3PrefixStatic         string        `env:"S3_PREFIX_STATIC" envDefault:"/"`
 	ResourceAccessRoles    []string      `env:"RESOURCE_ACCESS_ROLES" envDefault:"public"`
