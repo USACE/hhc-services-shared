@@ -142,7 +142,7 @@ func ResourceAccessWithConfig(accessConfig ResourceAccessConfig) echo.Middleware
 						}
 					default:
 						msg := fmt.Sprintf("\nThe user's scope and role '%s' not matching the authentication scope and role '%s, %s'\n", tokenRoleString, accessConfig.Scope, authRole)
-						log.Printf(msg)
+						log.Print(msg)
 						return c.JSON(http.StatusUnauthorized, map[string]string{"message": msg})
 					}
 				}

@@ -1,19 +1,17 @@
 package config
 
 import (
-	"context"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/caarlos0/env/v11"
 )
 
 // Config holds application configuration variables
 type Config struct {
 	AwsConfig              aws.Config
+	UsePathStyle           bool          `env:"USE_PATH_STYLE" envDefault:"false"`
 	ApplicationKey         string        `env:"APPLICATION_KEY"`
 	AuthEnvironment        string        `env:"AUTH_ENVIRONMENT"`
 	AuthPublicKey          string        `env:"AUTH_PUBLIC_KEY"`
@@ -50,28 +48,4 @@ func (c *Config) ParseEnvVars() error {
 			}
 		},
 	})
-}
-
-// LoadDefaultAwsConfig
-func (c *Config) LoadDefaultAwsConfig() (err error) {
-	// load aws config and get a client
-	// if MINIO_ENDPOINT_URL is set, use that as the endpoint
-	c.AwsConfig, err = config.LoadDefaultConfig(context.Background())
-
-	minioEndpointUrl, hasMinioEndpointUrl := os.LookupEnv("MINIO_ENDPOINT_URL")
-	if hasMinioEndpointUrl {
-		c.AwsConfig, err = config.LoadDefaultConfig(context.Background(),
-			config.WithEndpointResolverWithOptions(
-				aws.EndpointResolverWithOptionsFunc(
-					func(service, region string, options ...any) (aws.Endpoint, error) {
-						return aws.Endpoint{
-							URL:               minioEndpointUrl,
-							HostnameImmutable: true,
-						}, nil
-					}),
-			),
-		)
-	}
-
-	return err
 }
