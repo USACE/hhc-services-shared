@@ -11,6 +11,12 @@ services:
       - hhc-network
     restart: always
     environment:
+      AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE # local dev only using aws-sdk-go-v2
+      AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY # local dev only using aws-sdk-go-v2
+      AWS_DEFAULT_REGION: us-east-1 # local dev only using aws-sdk-go-v2
+      AWS_DISABLE_SSL: true # local dev only using aws-sdk-go-v2
+      AWS_ENDPOINT_URL: http://minio:9000
+      USE_PATH_STYLE: true
       PGUSER: hhc_shared_user
       PGPASSWORD: hhc_shared_pass
       PGDATABASE: postgres

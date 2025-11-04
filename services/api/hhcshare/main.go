@@ -1,28 +1,35 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"hhcshare/config"
 	"hhcshare/handler"
+
+	_config "hhcshare/config"
+	_middleware "hhcshare/middleware"
 )
 
 func main() {
 	// parse configuration from environment variables
 	// Environment Variable Config
-	var cfg config.Config
-	if err := cfg.ParseEnvVars(); err != nil {
+	var cfg _config.Config
+	err := cfg.ParseEnvVars()
+	if err != nil {
 		log.Fatalf("fail on parse env vars %s", err)
 	}
 
-	// LoadDefaultAwsConfig is a wrapper for LoadDefaultConfig to handle using MINIO locally
-	if err := cfg.LoadDefaultAwsConfig(); err != nil {
+	// Populate AWS Config with the values from the configurations
+	cfg.AwsConfig, err = config.LoadDefaultConfig(context.Background())
+	if err != nil {
 		log.Fatalf("failed to load AWS configuration %s", err)
 	}
 
@@ -32,6 +39,21 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Gzip())
+
+	// Middleware to serve static content from s3
+	// Routes use a base url and those have to be ignored here
+
+	e.Use(_middleware.S3StaticWithConfig(_middleware.S3StaticConfig{
+		Skipper: func(c echo.Context) bool {
+			path := c.Request().URL.Path
+			return strings.HasPrefix(path, "/api")
+		},
+		AwsConfig:    cfg.AwsConfig,
+		Bucket:       cfg.S3Bucket,
+		UsePathStyle: cfg.UsePathStyle,
+		Prefix:       cfg.S3PrefixStatic,
+		IgnoreBaseRegex: `^/shared/*`,
+	}))
 
 	// Groups
 	grp_api := e.Group("/api")
@@ -65,7 +87,7 @@ func main() {
 	)
 
 	// Database
-	pgStore, err := config.NewPgStore(&cfg)
+	pgStore, err := _config.NewPgStore(&cfg)
 	if err != nil {
 		e.Logger.Fatal(err.Error())
 	}

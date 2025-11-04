@@ -1,21 +1,25 @@
-ARG GO_VERSION=1.25.1
+ARG GO_VERSION=1.25
+ARG APPNAME=hhcshare
 
 # ----------------------------------------------------------------------
 # FROM build
 FROM golang:${GO_VERSION}-alpine AS gobuild
+# name it above or overwrite in IaC.
+ARG APPNAME
 
-RUN apk update \
-    && apk add --no-cache ca-certificates
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache ca-certificates
 
 WORKDIR /opt/go/src
 
-COPY ./hhcshare ./
+COPY ./${APPNAME} ./
 
 # Install Dependencies
-RUN go mod download \
-    && go mod verify
+RUN go mod download && go mod verify
 
-RUN echo $(grep nobody /etc/passwd) > /etc/passwd
+# adding our user for the scatch image to run as
+RUN adduser -D -u 10001 appuser && echo $(grep appuser /etc/passwd) > /etc/passwd
 
 # ----------------------------------------------------------------------
 # IMAGE FOR DEVELOPMENT
@@ -36,6 +40,6 @@ COPY --from=gobuild /etc/passwd /etc/passwd
 COPY --from=gobuild /etc/ssl/certs/ca-certificates.crt \
     /etc/ssl/certs/ca-certificates.crt
 
-USER nobody
+USER 10001
 
 ENTRYPOINT [ "/app" ]
