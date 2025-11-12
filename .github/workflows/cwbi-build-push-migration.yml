@@ -8,12 +8,17 @@ on:
     paths:
       - .github/workflows/cwbi-build-push-migration.yml
       - "services/migration/**"
+  schedule:
+    - cron: "3 11 * * 2" # Every Tuesday morning at 11:03 UTC (high loads are on the hour)
   # Allow the workflow to be triggered manually from the GitHub UI
   workflow_dispatch:
 
 env:
   AWS_REGION: us-gov-west-1 #Change to reflect your Region
   PATH_TO_DOCKERFILE: services/migration
+  CWBI_DEV_ROLE: arn:aws-us-gov:iam::718787032875:role/github-actions-ecr-hhc-shared
+  CWBI_TEST_ROLE: arn:aws-us-gov:iam::276847049069:role/github-actions-ecr-hhc-shared
+  CWBI_PROD_ROLE: arn:aws-us-gov:iam::648157167324:role/github-actions-ecr-hhc-shared
 
 # Permission can be added at job level or workflow level
 permissions:
@@ -21,44 +26,24 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  Build-Push-to-Env:
+  #~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+  build-push-dev:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.ref == 'refs/heads/cwbi-dev'
     runs-on: ubuntu-latest
+    env:
+      ECR_REPOSITORY: hhc-shared-migration
+      IMAGE_TAG: dev
     steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-
-      - name: Set Branch attributes
-        id: set-attributes
-        run: |
-          case "${GITHUB_REF##*/}" in
-            "cwbi-dev")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::718787032875:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-migration" >> $GITHUB_ENV
-              echo "IMAGE_TAG=dev" >> $GITHUB_ENV
-              ;;
-            "cwbi-test")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::276847049069:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-migration" >> $GITHUB_ENV
-              echo "IMAGE_TAG=test" >> $GITHUB_ENV
-              ;;
-            "cwbi-prod")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::648157167324:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-migration" >> $GITHUB_ENV
-              echo "IMAGE_TAG=prod" >> $GITHUB_ENV
-              ;;
-          esac
-
-      - name: Display Attributes
-        run: |
-          echo "ROLE_TO_ASSUME: $ROLE_TO_ASSUME"
-          echo "ECR_REPOSITORY: $ECR_REPOSITORY"
-          echo "IMAGE_TAG: $IMAGE_TAG"
-
+      - uses: actions/checkout@v4
+        with:
+          ref: cwbi-dev
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          role-to-assume: ${{ env.CWBI_DEV_ROLE }}
           output-credentials: true
 
       # Hello from AWS: WhoAmI
@@ -83,3 +68,89 @@ jobs:
       - name: ECR Logout
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+  #~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+  build-push-test:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.ref == 'refs/heads/cwbi-test'
+    runs-on: ubuntu-latest
+    env:
+      ECR_REPOSITORY: hhc-shared-migration
+      IMAGE_TAG: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cwbi-test
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.CWBI_TEST_ROLE }}
+          output-credentials: true
+
+      # Hello from AWS: WhoAmI
+      - name: Sts GetCallerIdentity
+        run: aws sts get-caller-identity
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: "true"
+
+      - name: Build Image; Push to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build --push \
+          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
+          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+          ${{ env.PATH_TO_DOCKERFILE }}
+
+      - name: ECR Logout
+        if: always()
+        run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+  #~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+  # build-push-prod:
+  #   if: >-
+  #     github.event_name == 'schedule' ||
+  #     github.ref == 'refs/heads/cwbi-prod'
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     ECR_REPOSITORY: hhc-shared-migration
+  #     IMAGE_TAG: prod
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: cwbi-prod
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-region: ${{ env.AWS_REGION }}
+  #         role-to-assume: ${{ env.CWBI_PROD_ROLE }}
+  #         output-credentials: true
+
+  #     # Hello from AWS: WhoAmI
+  #     - name: Sts GetCallerIdentity
+  #       run: aws sts get-caller-identity
+
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v2
+  #       with:
+  #         mask-password: "true"
+
+  #     - name: Build Image; Push to ECR
+  #       env:
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #       run: |
+  #         docker build --push \
+  #         --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
+  #         --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+  #         ${{ env.PATH_TO_DOCKERFILE }}
+
+  #     - name: ECR Logout
+  #       if: always()
+  #       run: docker logout ${{ steps.login-ecr.outputs.registry }}
