@@ -6,8 +6,8 @@ on:
   push:
     branches: [cwbi-dev, cwbi-test, cwbi-prod]
     paths:
-      - .github/workflows/cwbi-build-push-migration.yml
       - "services/migration/**"
+      # - .github/workflows/cwbi-build-push-migration.yml
   schedule:
     - cron: "30 12 * * 2" # Every Tuesday morning at 12:30 UTC (after cwbi-images flyway)
   # Allow the workflow to be triggered manually from the GitHub UI
