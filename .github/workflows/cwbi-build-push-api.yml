@@ -7,7 +7,6 @@ on:
     branches: [cwbi-dev, cwbi-test, cwbi-prod]
     paths:
       - "services/api/**"
-      # - .github/workflows/cwbi-build-push-api.yml
   # Allow the workflow to be triggered manually from the GitHub UI
   workflow_dispatch:
 
@@ -48,12 +47,6 @@ jobs:
               ;;
           esac
 
-      - name: Display Attributes
-        run: |
-          echo "ROLE_TO_ASSUME: $ROLE_TO_ASSUME"
-          echo "ECR_REPOSITORY: $ECR_REPOSITORY"
-          echo "IMAGE_TAG: $IMAGE_TAG"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -76,9 +69,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build --push \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-          ${{ env.PATH_TO_DOCKERFILE }}
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          $PATH_TO_DOCKERFILE
 
       - name: ECR Logout
         if: always()
