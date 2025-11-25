@@ -61,9 +61,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build --push \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-          ${{ env.PATH_TO_DOCKERFILE }}
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          $PATH_TO_DOCKERFILE
 
       - name: ECR Logout
         if: always()
@@ -104,9 +104,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build --push \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-          ${{ env.PATH_TO_DOCKERFILE }}
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          $PATH_TO_DOCKERFILE
 
       - name: ECR Logout
         if: always()
@@ -147,9 +147,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build --push \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest \
-          --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-          ${{ env.PATH_TO_DOCKERFILE }}
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          $PATH_TO_DOCKERFILE
 
       - name: ECR Logout
         if: always()
