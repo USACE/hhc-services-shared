@@ -52,7 +52,6 @@ func main() {
 		Bucket:       cfg.S3Bucket,
 		UsePathStyle: cfg.UsePathStyle,
 		Prefix:       cfg.S3PrefixStatic,
-		IgnoreBaseRegex: `^/shared/*`,
 	}))
 
 	// Groups
