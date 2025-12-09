@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"hhcshare/model"
+	"github.com/hhc-services-shared/services/api/model"
 
 	"github.com/labstack/echo/v4"
 )

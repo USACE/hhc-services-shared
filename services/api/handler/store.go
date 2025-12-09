@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"hhcshare/config"
+	"github.com/hhc-services-shared/services/api/config"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
