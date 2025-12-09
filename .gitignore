@@ -1,5 +1,54 @@
-# mac stuff
-**/*.DS_Store
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+docs
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sql
+
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Editor/IDE
+# .idea/
+# .vscode/
 
 # geometry tar and tar.zip files
 **/geom/*.sql
@@ -9,3 +58,7 @@
 # Go delve debugger files
 **/.config/dlv
 **/__debug_bin*
+
+# ignore media except the directory structure
+_media/shared/ui/*
+!_media/shared/ui/.gitkeep
