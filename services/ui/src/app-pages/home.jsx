@@ -67,7 +67,7 @@ export default function Home() {
 
             <a href={`${base}workforce`} target="_blank" rel="noopener noreferrer">
               <Card>
-                <H2>Water Management Workforce</H2>
+                <H2>HH&C Workforce</H2>
                 <Text>
                   Workforce is to enable senior leadership to asses the
                   strengths and weaknesses of the CoP workforce across districts
