@@ -6,17 +6,18 @@
 function usage() {
     cat <<EOF
 
-Usage: $0 [dev|test|prod|clear|help]
+Usage: $0 [-m] [-h] [dev|test|prod|clear|help]
 
 No argument runs 'vite build'.  With argument runs 'vite build --mode arg',
 where arg is dev, test, or prod. All commands result in moving the resulting
 './dist' files into ./_media/ui/.
 
+  -m:    build and move to ${MEDIA}
+  -h:    display this help message
   dev:   vite build using mode dev using env vars from .env.dev
   test:  vite build using mode test using env vars from .env.test
   prod:  vite build using mode prod using env vars from .env.prod
   clear: remove all files from '${MEDIA}'
-  help:  display this help message
 
   There is a local variable PREFIX (${PREFIX}) that references the relative
   path to package.json. There is another local variable MEDIA (${MEDIA}) that
@@ -32,31 +33,63 @@ EOF
 PREFIX=./services/ui
 MEDIA=./_media/shared/ui
 
+MOVE=0
+
+# Parse optional flags first
+while getopts "mh" opt; do
+  case $opt in
+    m)
+        MOVE=1
+        ;;
+    h)
+        usage
+        ;;
+    *)
+        usage
+        ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+
 if [ $# -eq 0 ]; then
-    npm run --prefix ${PREFIX} build-mv
+    if [ ${MOVE} -eq 1 ]; then
+        npm run --prefix "${PREFIX}" build-mv
+    else
+        npm run --prefix "${PREFIX}" build
+    fi
     exit 0
 fi
 
 for cmd in "$@"; do
     case $cmd in
     dev)
-        npm run --prefix ${PREFIX} build-mv-dev
+        if [ ${MOVE} -eq 1 ]; then
+            npm run --prefix ${PREFIX} build-mv-dev
+        else
+            npm run --prefix ${PREFIX} build-dev
+        fi
         exit 0
         ;;
     test)
-        npm run --prefix ${PREFIX} build-mv-test
+        if [ ${MOVE} -eq 1 ]; then
+            npm run --prefix ${PREFIX} build-mv-test
+        else
+            npm run --prefix ${PREFIX} build-test
+        fi
         exit 0
         ;;
     prod)
-        npm run --prefix ${PREFIX} build-mv-prod
+        if [ ${MOVE} -eq 1 ]; then
+            npm run --prefix ${PREFIX} build-mv-prod
+        else
+            npm run --prefix ${PREFIX} build-prod
+        fi
         exit 0
         ;;
     clear)
         find ${MEDIA} -mindepth 1 ! -name '.gitkeep' -exec rm -rf {} +
         exit 0
-        ;;
-    help)
-        usage
         ;;
     esac
 done

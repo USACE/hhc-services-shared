@@ -217,3 +217,83 @@ The Python script `master_data_geom.py` reads geojson from ARC GIS services, def
     - Military
 
 Not every District has these boundaries defined.  SQL files are generated if that District has geojson defined for a particular mission, and that file is written to a zip file.  The result of running this script is a collection of SQL files, one for each District, each having their respective boundaries defined in the `mission_geom.zip` file.
+
+## Update the UI
+There is no role or CI/CD setup for this repo to update the UI to any CWBI environment.  This UI should not be updated that often, so not really worth the effort to have a role and go through the change management to get all the setup.<br><br>The following describes steps using `aws-adfs` login and some suggestions that could make uploads a bit easier.
+
+### Build the ./dist
+A bash script is available to make life a little easier to build the UI for the envrionment you want to update.  A `dotenv` file already has the configurations setup and do not need to be modified.  Use the `./build_mv.sh` script with its options to build or build/move for the respective CWBI environment.
+
+```bash
+Usage: ./build_mv.sh [-m] [-h] [dev|test|prod|clear|help]
+
+No argument runs 'vite build'.  With argument runs 'vite build --mode arg',
+where arg is dev, test, or prod. All commands result in moving the resulting
+'./dist' files into ./_media/ui/.
+
+  -m:    build and move to ./_media/shared/ui
+  -h:    display this help message
+  dev:   vite build using mode dev using env vars from .env.dev
+  test:  vite build using mode test using env vars from .env.test
+  prod:  vite build using mode prod using env vars from .env.prod
+  clear: remove all files from './_media/shared/ui'
+
+  There is a local variable PREFIX (./services/ui) that references the relative
+  path to package.json. There is another local variable MEDIA (./_media/shared/ui) that
+  references the relative path to media files.
+
+  These two local variables should be modified to fit your repo's needs.
+```
+
+## Update the UI on AWS
+
+### AWS Config Profile
+Define a profile in the local file ~/.aws/config with suggested inputs below.  This allows for a simple and short aws-adfs login command:
+
+```bash
+aws-adfs login --profile PROFILE
+```
+
+Suggested Profile Configuration:
+
+- region = REGION_NAME
+- output = json
+- adfs_config.ssl_verification = True
+- adfs_config.role_arn = ROLE_ARN
+- adfs_config.adfs_host = ADFS_HOST
+- adfs_config.session_duration = SESSION_DURATION_SECONDS
+- adfs_config.provider_id = PROVIDER_ID
+- adfs_config.sspi = False
+- adfs_config.duo_factor = None
+- adfs_config.duo_device = None
+- adfs_config.adfs_user = ADFS_USER
+
+
+### Update AWS S3
+
+A2W static content is served directly from an AWS S3 bucket, `a2w-dev`, `a2w-static-test`, and `a2w-static-prod`.  Each bucket requires files to be updated after UI changes and a merge into the `develop` branch.  Bucket prefix for Test and Prod are both `site/`.
+
+*`a2w-dev` is currently setup with CI/CD
+
+### Update Content, AWS CLI
+
+- Make sure to ***first*** log into your account using `aws-adfs` on the command line.
+- Make sure to replace `BUCKET_NAME` and `PREFIX`.
+- Remove `--dryrun` when ready to execute on S3
+
+Remove files from bucket/prefix/assets:
+```bash
+aws s3 --profile PROFILE_NAME rm s3://BUCKET_NAME/PREFIX/assets --recursive --dryrun
+```
+
+Copy files that have changed:
+```bash
+aws s3 --profile PROFILE_NAME sync ./dist s3://BUCKET_NAME/PREFIX --exclude "*.DS_Store" --dryrun
+```
+
+*`*.DS_Store` is for the Mac users to not copy those files to S3
+
+All-in-one remove and update:
+```bash
+aws s3 --profile PROFILE_NAME rm s3://BUCKET_NAME/PREFIX/assets --recursive && aws s3 --profile PROFILE_NAME sync ./dist s3://BUCKET_NAME/PREFIX --exclude "*.DS_Store"
+```
