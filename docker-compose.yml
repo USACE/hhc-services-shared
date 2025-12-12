@@ -3,7 +3,6 @@ services:
   hhc-api:
     build:
       context: ./services/api
-      dockerfile: dockerfile
     #   target: development
     # command: dlv debug /opt/go/src --accept-multiclient --headless --listen ":2345" --continue
     container_name: hhc-api
@@ -34,7 +33,7 @@ services:
     #   - "8080:8080"
     #   - "2345:2345"
     volumes:
-      - ./services/api/hhcshare:/opt/go/src:rw
+      - ./services/api:/opt/go/src:rw
     depends_on:
       hhc-db:
         condition: service_started
