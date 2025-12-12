@@ -12,10 +12,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"hhcshare/handler"
+	"github.com/hhc-services-shared/services/api/handler"
 
-	_config "hhcshare/config"
-	_middleware "hhcshare/middleware"
+	_config "github.com/hhc-services-shared/services/api/config"
+	_middleware "github.com/hhc-services-shared/services/api/middleware"
 )
 
 func main() {
