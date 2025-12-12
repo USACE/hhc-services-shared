@@ -1,11 +1,8 @@
 ARG GO_VERSION=1.25
-ARG APPNAME=hhcshare
 
 # ----------------------------------------------------------------------
-# FROM build
-FROM golang:${GO_VERSION}-alpine AS gobuild
-# name it above or overwrite in IaC.
-ARG APPNAME
+# BUILDER BUILD STAGE
+FROM golang:${GO_VERSION}-alpine AS builder
 
 RUN apk update && \
     apk upgrade && \
@@ -13,7 +10,7 @@ RUN apk update && \
 
 WORKDIR /opt/go/src
 
-COPY ./${APPNAME} ./
+COPY . .
 
 # Install Dependencies
 RUN go mod download && go mod verify
@@ -22,22 +19,22 @@ RUN go mod download && go mod verify
 RUN adduser -D -u 10001 appuser && echo $(grep appuser /etc/passwd) > /etc/passwd
 
 # ----------------------------------------------------------------------
-# IMAGE FOR DEVELOPMENT
-FROM gobuild AS development
+# DEVELOPMENT BUILD STAGE
+FROM builder AS development
 RUN go install github.com/go-delve/delve/cmd/dlv@latest \
     && go get github.com/go-delve/delve
 
 # ----------------------------------------------------------------------
-# IMAGE FOR PRODUCTION THAT SCRATCH USES
-FROM gobuild AS production
+# PRODUCTION BUILD STAGE
+FROM builder AS production
 RUN go build -ldflags="-w -s" -o /opt/go/bin/app
 
 # ----------------------------------------------------------------------
-# SCRATCH IMAGE
+# SCRATCH BUILD STAGE
 FROM scratch
 COPY --from=production /opt/go/bin/app /app
-COPY --from=gobuild /etc/passwd /etc/passwd
-COPY --from=gobuild /etc/ssl/certs/ca-certificates.crt \
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt \
     /etc/ssl/certs/ca-certificates.crt
 
 USER 10001

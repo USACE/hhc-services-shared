@@ -1,4 +1,4 @@
-module hhcshare
+module github.com/hhc-services-shared/services/api
 
 go 1.25.3
 
