@@ -56,7 +56,7 @@ go.work.sum
 **/geom/*.tar.gz
 
 # Go delve debugger files
-**/.config/dlv
+**/.config
 **/__debug_bin*
 
 # ignore media except the directory structure
