@@ -5,7 +5,7 @@
       {
         "type": "shell",
         "label": "remove debug_bin",
-        "command": "rm -rf ${workspaceFolder}/services/api/hhcshare/__debug_bin* ${workspaceFolder}/services/api/hhcshare/.config/",
+        "command": "rm -rf ${workspaceFolder}/services/api/__debug_bin* ${workspaceFolder}/services/api/.config",
       },
     ],
 }
