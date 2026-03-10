@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -109,6 +110,6 @@ func main() {
 
 	addressPort := fmt.Sprintf(":%s", port)
 
-	e.Logger.Printf("Starting main server on :%s...", addressPort)
+	e.Logger.Printf("Starting server with Go version %s on :%s...", runtime.Version(), addressPort)
 	e.Logger.Fatal(e.Start(addressPort))
 }
