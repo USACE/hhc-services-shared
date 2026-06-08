@@ -3,10 +3,10 @@ package model
 import (
 	"context"
 
-	"github.com/georgysavva/scany/pgxscan"
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/gofrs/uuid"
 	"github.com/huandu/go-sqlbuilder"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Office struct {
@@ -43,7 +43,7 @@ func ListOffices(db *pgxpool.Pool, cnames []string) ([]OfficeFull, error) {
 	sql, _ := sb.Build()
 
 	var offices []OfficeFull
-	if err := pgxscan.Select(context.TODO(), db, &offices, sql); err != nil {
+	if err := pgxscan.Select(context.Background(), db, &offices, sql); err != nil {
 		return nil, err
 	}
 
@@ -75,7 +75,7 @@ func OfficeGeometry(db *pgxpool.Pool, office string, aors []string) (FeatureColl
 
 	fc := DefaultFeatureCollection()
 
-	rows, err := db.Query(context.TODO(), sql, args...)
+	rows, err := db.Query(context.Background(), sql, args...)
 	if err != nil {
 		return fc, err
 	}

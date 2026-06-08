@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PgStore struct {
@@ -26,7 +26,7 @@ func NewPgStore(cfg *Config) (store *PgStore, err error) {
 	poolConfig.MinConns = int32(cfg.PgxPoolMinconns)
 	poolConfig.MaxConnIdleTime = cfg.PgxPoolMaxconnIdletime
 
-	db, err := pgxpool.ConnectConfig(context.Background(), poolConfig)
+	db, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
 		return store, err
 	}
