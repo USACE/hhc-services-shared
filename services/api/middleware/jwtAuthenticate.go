@@ -47,7 +47,7 @@ type (
 		Subject           string         `json:"sub,omitempty"`
 		Audience          []string       `json:"aud,omitempty"`
 		// jwt.StandardClaims  // this is for 'aud' that is a string
-		jwt.MapClaims  // start using this with custom claims
+		jwt.MapClaims // start using this with custom claims
 	}
 )
 
