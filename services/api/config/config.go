@@ -32,6 +32,7 @@ type Config struct {
 }
 
 // ParseEnvVars parses environment variables and sets them to the Config struct
+// THESE PUBLIC KEYS ARE FROM KEYCLOAK identity.../auth/realms/cwbi AND ARE USED INSTEAD OF CALLING DIRECTLY.
 func (c *Config) ParseEnvVars() error {
 	return env.ParseWithOptions(c, env.Options{
 		OnSet: func(tag string, value any, isDefault bool) {
