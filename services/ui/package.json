@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "@usace/groundwork": "^3.15.1",
+    "@usace/groundwork": "^4.3.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
