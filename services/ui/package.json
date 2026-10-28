@@ -17,7 +17,7 @@
     "build-mv-prod": "vite build --mode prod && rm -fr ../../_media/shared/ui/* && mv -f ./dist/* ../../_media/shared/ui/"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.3.3",
     "@usace/groundwork": "^4.3.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
