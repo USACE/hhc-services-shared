@@ -23,7 +23,7 @@ docs
 *.njsproj
 *.sln
 *.sw?
-*.sql
+
 
 #
 # Binaries for programs and plugins
