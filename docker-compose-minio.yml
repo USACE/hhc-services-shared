@@ -1,7 +1,7 @@
 services:
   minio:
-    image: minio/minio
-    container_name: minio
+    image: pgsty/silo
+    container_name: silo
     networks:
       - hhc-network
     environment:
@@ -12,8 +12,8 @@ services:
       - "9000-9001:9000-9001"
   # --------------------------------------
   minio-init:
-    image: minio/mc
-    container_name: minio-init
+    image: pgsty/mc
+    container_name: silo-init
     networks:
       - hhc-network
     entrypoint:
