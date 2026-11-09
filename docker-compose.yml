@@ -1,4 +1,9 @@
 name: hhc-shared-stack
+
+# compose files to include
+include:
+  - docker-compose-minio.yml
+
 services:
   hhc-api:
     build:
