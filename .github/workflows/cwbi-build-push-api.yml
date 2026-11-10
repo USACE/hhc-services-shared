@@ -7,55 +7,52 @@ on:
     branches: [cwbi-dev, cwbi-test, cwbi-prod]
     paths:
       - "services/api/**"
-  # Allow the workflow to be triggered manually from the GitHub UI
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-gov-west-1 #Change to reflect your Region
+  AWS_REGION: us-gov-west-1
   PATH_TO_DOCKERFILE: services/api
+  ECR_REPOSITORY: hhc-shared-api
 
 # Permission can be added at job level or workflow level
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
 
+# letting only one run or job in the group execute at a time
+concurrency:
+  group: build-hhcshare-api-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'cwbi-prod' }} # cancel currently executing run and pending if a new one starts
+
 jobs:
   Build-Push-to-Env:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set Branch attributes
-        id: set-attributes
+      - name: Set branch attributes
         run: |
-          case "${GITHUB_REF##*/}" in
-            "cwbi-dev")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::718787032875:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-api" >> $GITHUB_ENV
-              echo "IMAGE_TAG=dev" >> $GITHUB_ENV
-              ;;
-            "cwbi-test")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::276847049069:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-api" >> $GITHUB_ENV
-              echo "IMAGE_TAG=test" >> $GITHUB_ENV
-              ;;
-            "cwbi-prod")
-              echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::648157167324:role/github-actions-ecr-hhc-shared" >> $GITHUB_ENV
-              echo "ECR_REPOSITORY=hhc-shared-api" >> $GITHUB_ENV
-              echo "IMAGE_TAG=prod" >> $GITHUB_ENV
-              ;;
+          case "$GITHUB_REF_NAME" in
+            cwbi-dev)  ACCOUNT=718787032875; TAG=dev ;;
+            cwbi-test) ACCOUNT=276847049069; TAG=test ;;
+            cwbi-prod) ACCOUNT=648157167324; TAG=prod ;;
+            *) echo "::error::Unsupported branch: $GITHUB_REF_NAME"; exit 1 ;;
           esac
+          {
+            echo "ROLE_TO_ASSUME=arn:aws-us-gov:iam::${ACCOUNT}:role/github-actions-ecr-hhc-shared"
+            echo "IMAGE_TAG=${TAG}"
+          } >> "$GITHUB_ENV"
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ env.ROLE_TO_ASSUME }}
-          output-credentials: true
+          role-session-name: gha-ldm-migration-${{ github.run_id }}
 
-      # Hello from AWS: WhoAmI
-      - name: Sts GetCallerIdentity
+      - name: Verify identity
         run: aws sts get-caller-identity
 
       - name: Login to Amazon ECR
@@ -64,14 +61,18 @@ jobs:
         with:
           mask-password: "true"
 
-      - name: Build Image; Push to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          docker build --push \
-          --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-          $PATH_TO_DOCKERFILE
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ env.PATH_TO_DOCKERFILE }}
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
       - name: ECR Logout
         if: always()
