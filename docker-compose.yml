@@ -13,7 +13,7 @@ services:
     container_name: hhc-api
     networks:
       - hhc-network
-    restart: always
+    restart: unless-stopped
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE # local dev only using aws-sdk-go-v2
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY # local dev only using aws-sdk-go-v2
@@ -34,8 +34,8 @@ services:
       S3_PREFIX_STATIC: /shared/ui
       API_PORT: 8080
       API_LOG: true
-    # ports:
-    #   - "8080:8080"
+    ports:
+      - "8080:8080"
     #   - "2345:2345"
     volumes:
       - ./services/api:/opt/go/src:rw
@@ -47,11 +47,13 @@ services:
   # --------------------------------------
   hhc-db:
     platform: linux/amd64
-    image: postgis/postgis:latest
+    image: postgis/postgis:17-3.6
+    volumes:
+      - ./services/migration/nomigration/PostGIS_Setup.sql:/docker-entrypoint-initdb.d/zz_PostGIS_Setup.sql:ro
     container_name: hhc-db
     networks:
       - hhc-network
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
