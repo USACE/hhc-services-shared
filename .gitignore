@@ -62,3 +62,6 @@ go.work.sum
 # ignore media except the directory structure
 _media/shared/ui/*
 !_media/shared/ui/.gitkeep
+
+# ignore trivy reports
+**/trivy-scan/*

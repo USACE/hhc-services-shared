@@ -14,7 +14,7 @@ ARG GEOM_VERSION=v0.1.1
 ENV OPT_MIGRATION=/opt/migration
 
 # Building with cwbi-apps flyway
-RUN apk update \
+RUN apk upgrade --no-cache \
     && apk add postgis postgresql-client unzip curl
 
 # the next two RUNs are for a base image flyway/flyway if needed

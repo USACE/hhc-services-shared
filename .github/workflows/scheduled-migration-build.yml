@@ -1,0 +1,26 @@
+name: Scheduled Migration build (dev, test, prod)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1" # Monday 08:00 UTC = 02:00 CST
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [cwbi-dev, cwbi-test, cwbi-prod]
+    steps:
+      - name: Dispatch Migration build on ${{ matrix.branch }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run cwbi-build-push-migration.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ matrix.branch }}"

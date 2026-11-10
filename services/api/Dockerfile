@@ -1,12 +1,11 @@
-ARG GO_VERSION=1.27.0
+ARG GO_VERSION=1.27
 
 # ----------------------------------------------------------------------
 # BUILDER BUILD STAGE
 FROM golang:${GO_VERSION}-alpine AS builder
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache ca-certificates
+RUN apk upgrade --no-cache \
+    && apk add --no-cache ca-certificates
 
 WORKDIR /opt/go/src
 
