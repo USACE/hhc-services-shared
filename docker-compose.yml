@@ -1,8 +1,8 @@
 name: hhc-shared-stack
 
 # compose files to include
-include:
-  - docker-compose-minio.yml
+# include:
+#   - docker-compose-minio.yml
 
 services:
   hhc-api:
@@ -34,8 +34,8 @@ services:
       S3_PREFIX_STATIC: /shared/ui
       API_PORT: 8080
       API_LOG: true
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
     #   - "2345:2345"
     volumes:
       - ./services/api:/opt/go/src:rw
